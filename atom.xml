@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>谭先生的✨</title>
-    <updated>2019-05-26T12:28:35.915Z</updated>
+    <updated>2019-05-26T12:31:25.537Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
-    <subtitle>一个写不来代码的程序猿的屋纸</subtitle>
+    <subtitle>敲不出代码的程序猿屋纸</subtitle>
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 谭先生的✨</rights>
