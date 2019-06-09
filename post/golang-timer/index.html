@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Original Inteneion | 🌟谭先生✨</title>
+<title>Golang Timer | 🌟谭先生✨</title>
 <link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1560076967261">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
@@ -78,37 +78,55 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              Original Inteneion
+              Golang Timer
             </h2>
             <div class="post-info">
               <time class="post-time">
-                · 2019-05-26 ·
+                · 2019-06-09 ·
               </time>
               
-                <a href="https://twFR.github.io/tag/-UwevvaAf" class="post-tag">
-                  # mood
+                <a href="https://twFR.github.io/tag/Z7--HtZrc" class="post-tag">
+                  # golang
                 </a>
               
             </div>
             
-              <div class="post-feature-image" style="background-image: url('https://twFR.github.io/post-images/original-inteneion.JPG')">
-              </div>
-            
             <div class="post-content">
-              <p>作为一个重度拖延症患者<br>
-是时候开始给自己的生活一点目标了！<br>
-最近想换工作 不停的在学习 才发现自己真的low到爆<br>
-讲道理 先立一个flag🇺🇳<br>
-今年一定要脱坑</p>
-<p><s>同时 今年能不能脱单呢  哈哈</s></p>
-<p>花了一下午搭了这个blog<br>
-希望能不忘自己的初衷<br>
-学习 奋斗 加油！</p>
-<img src ="http://wx3.sinaimg.cn/large/0068Lfdely1frpye1fsgsj30g20g20t9.jpg" width = "100" height = "100" div align=left>
+              <p>我们trm里面有个kube-system项目，由于是k8s的内置namespace，所以创建的时间比较早，在当时的情况下没有办法在cfe创建icagent的守护进程，所以以前没有默认开启平台监控这个功能。</p>
+<p>然后有同事反应必须要开启，不然就不能做到日志转储，导致磁盘空间占满，于是我想到了一个办法，之所以没办法开启，是因为当时的条件创不出来，但是等到环境安装到一定进度后，有条件了就可以创建出来了。可以设计一个定时器，在创建这个项目的时候就开始创这个icagent ，每隔20秒创建一次，直到创建成功。
+定时器设计如下：</p>
+<pre><code>func CreateProject() {
+	PresetProject() //创建kube-system
+	go func() {
+		isSucceed := false //设置标志位
+		logger.info(&quot;start try to create icagent daemonset&quot;)
+		for !isSucceed {
+			err := createIcagent()
+			if err == nil {
+				isSucceed = true
+				logger.info(&quot;create icagent daemonset succeed&quot;)
+			}
+			time.Sleep(20 * time.Second)
+		}
+	}()
+	return
+}
+</code></pre>
+<p>一个很简单的定时器，用isSucceed作为标志位，如果是失败的就一直循环创建，一旦成功，就退出了这个goroutine。</p>
+
             </div>
           </article>
         </div>
 
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://twFR.github.io/post/original-inteneion">
+              <h3 class="post-title">
+                Original Inteneion
+              </h3>
+            </a>
+          </div>
         
 
         
