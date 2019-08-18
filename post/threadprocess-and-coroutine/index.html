@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Thread、Process and Coroutine | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1566126457511">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1566126596869">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1566126457511" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1566126596869" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -107,6 +107,28 @@
 <p>线程默认的栈是8m，而一个协程只需要几十kb</p>
 <p>极高的执行效率：因为子程序切换不是线程切换，而是由程序自身控制，因此，没有线程切换的开销，和多线程比，线程数量越多，协程的性能优势就越明显；</p>
 <p>不需要多线程的锁机制：因为只有一个线程，也不存在同时写变量冲突，在协程中控制共享资源不加锁，只需要判断状态就好了，所以执行效率比多线程高很多。</p>
+<pre><code>type work struct {
+	x, y, z int
+}
+
+func worker(in &lt;- chan *work, out chan &lt;-  *work) {
+	for w := range in{
+		w.z = w.x * w.y
+		Sleep(w.z)
+		out &lt;- w
+	}
+	}
+
+func Run()  {
+	in , out:= make(chan *work), make(chan *work)
+	for i:= 0; i&lt; NumWorks; i++{
+		go worker(in, out)
+	}
+	go sendLotsOfWork(in)
+	receiveLotsOfResults(out)
+
+}
+</code></pre>
 
             </div>
           </article>
