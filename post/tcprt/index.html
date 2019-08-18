@@ -1,0 +1,228 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TCP reliable transmission | 🌟谭先生✨</title>
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1566124274576">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://twFR.github.io">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1566124274576" alt="">
+  </a>
+  <h1 class="site-title">
+    🌟谭先生✨
+  </h1>
+  <p class="site-description">
+    敲不出代码的程序猿的🏠
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/twFR" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              TCP reliable transmission
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2019-06-23 ·
+              </time>
+              
+                <a href="https://twFR.github.io/tag/Cuv3xTbgq" class="post-tag">
+                  # net
+                </a>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>🏫一直以来对TCP连接的可靠性，三次握手，四次挥手有过了解，但要组织语言说出来好像还真不容易，今天就系统的记录一下，以供更加深入的理解。</p>
+<h2 id="为什么说tcp可靠">为什么说TCP可靠</h2>
+<p>🔗说到tcp可靠性，就要先来看看tcp有哪些特点了，tcp是面向连接的，面向字节流 的连接，能通过丢包重发,超时重试等方式保证可靠传输，且支持全双工通信，支持端口到端口的连接，每一条TCP连接只能有两个端点。
+<font size="2">ps：全双工指可以同时（瞬时）进行信号的双向传输（A→B且B→A）。指A→B的同时B→A，是瞬时同步的。</font><br /></p>
+<p>🔐tcp的可靠性是通过下面几点来实现的</p>
+<ul>
+<li>
+<p>校验和 端到端的校验和，由发送端计算，然后由接收端验证。其目的是为了发现TCP首部和数据在发送端到接收端之间发生的任何改动。如果接收方检测到校验和有差错，则TCP段会被直接丢弃。</p>
+</li>
+<li>
+<p>序列号（按序到达）</p>
+</li>
+<li>
+<p>确认应答（ACK）机制  TCP将每个字节的数据都进行了编号，即为序列号，每一个ACK都带有对应的确认序列号, 意思是告诉发送者, 我已经收到了哪些数据，下一次你从哪里开始发。</p>
+</li>
+<li>
+<p>超时重传机制  在一个特定时间间隔内没有收到发来的确认应答, 会进行重发。超时的时间长短是通过动态确定的，以500ms为一个单位进行控制，如果重发一次之后, 仍然得不到应答, 等待 2*500ms 后再进行重传，依次类推, 以指数形式递增， 累计到一定的重传次数, TCP认为网络或者对端主机出现异常, 强制关闭连接。</p>
+</li>
+<li>
+<p>流量控制  当接受方来不及处理发送方的数据，能提示发送方降低发送的速率，防止包丢失 ；通过窗口来控制 （窗口大小字段越大, 说明网络的吞吐量越高，窗口在下文报文段里的16位字段）</p>
+</li>
+<li>
+<p>拥塞控制 一开始不确定网络状态，如果一下发送大量数据，可能会导致网络拥堵，所以控制从小到大，慢慢增大控制控制拥塞窗口数值，具体实现如下：
+1）TCP连接初始化，将拥塞窗口设置为1
+2）执行慢开始算法，cwind（拥塞窗口）按指数规律增长，直到cwind == ssthress（慢开始门限）开始执行拥塞避免算法，cwnd按线性规律增长
+3）当网络发生拥塞，把ssthresh值更新为拥塞前ssthresh值的一半，cwnd重新设置为1，按照步骤（2）执行。</p>
+</li>
+</ul>
+<p>👍通过这六个策略，保障了tcp连接的可靠性</p>
+<h2 id="看看tcp报文段格式">看看TCP报文段格式</h2>
+<p><img src="http://img4.imgtn.bdimg.com/it/u=2627348429,2184604078&amp;fm=214&amp;gp=0.jpg" alt="TCP报文段" title="TCP报文段"></p>
+<p>👨🏻‍💻解释下各个字段用途：</p>
+<ul>
+<li>源/目的端口号: 表示数据是从哪个进程来, 到哪个进程去；</li>
+<li>4字节序列号（seq）/32位确认号（ack）:相互协同，保证可靠性，保证按序到达。</li>
+<li>4位TCP报头长度: 表示该TCP头部有多少个32位bit(有多少个4字节); 所以TCP头部最大长度是15 * 4 = 60</li>
+<li>6位标志位:</li>
+</ul>
+<blockquote>
+<blockquote>
+<p>URG: 紧急指针是否有效
+ACK: 确认号是否有效
+PSH: 提示接收端应用程序立刻从TCP缓冲区把数据读走
+RST: 对方要求重新建立连接，我们把携带RST标识的称为复位报文段
+SYN: 请求建立连接，我们把携带SYN标识的称为同步报文段
+FIN: 通知对方, 本端要关闭了, 我们称携带FIN标识的为结束报文段</p>
+</blockquote>
+</blockquote>
+<ul>
+<li>16位窗口大小:自己的接收缓冲区大小（没错，就是前面流量控制的窗口）</li>
+<li>6位校验和: 发送端填充, CRC校验. 接收端校验不通过, 则认为数据有问题. 此处的检验和不光包含TCP首部, 也包含TCP数据部分.</li>
+<li>16位紧急指针: 标识哪部分数据是紧急数据
+PS：ACK、SYN和FIN这些大写的单词表示标志位，其值要么是1，要么是0；ack、seq小写的单词表示序号。</li>
+</ul>
+<h2 id="tcp建立连接三次握手">TCP建立连接（三次握手）</h2>
+<p><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3554453119,3518152184&amp;fm=15&amp;gp=0.jpg" alt="三次握手" title="三次握手">
+🤝第一次握手：建立连接时，客户端【CLOSED -&gt; SYN_SENT】发送syn包（SYN=1，seq=x）到服务器，并进入SYN_SENT状态，等待服务器【CLOSED-&gt;LISTEN】确认；SYN：同步序列编号（Synchronize Sequence Numbers）。</p>
+<p>🤝第二次握手：服务器收到syn包，必须确认客户的SYN，同时服务器【LISTEN-&gt;SYN_RCVD】也发送一个SYN包（SYN=1，ACK=1，seq=y，ack=x+1），此时服务器进入SYN_RCVD状态；</p>
+<p>🤝第三次握手：客户端收到服务器的同步包，向服务器发送确认包ACK(ack=y+1），此包发送完毕，客户端【SYN_SENT -&gt; ESTABLISHED】和服务器【SYN_RCVD -&gt; ESTABLISHED】进入ESTABLISHED（TCP连接成功）状态，完成三次握手。</p>
+<p><font size="3">ps：发送报文段确认号实际就为收到的报文段序列号加1，以保证按序到达</font><br /></p>
+<h2 id="tcp关闭连接四次挥手">TCP关闭连接（四次挥手）</h2>
+<p><img src="http://img0.ph.126.net/silia0LWWddxSzcvFjPHQQ==/6632311313349802875.png" alt="三次握手" title="三次握手">
+🙋第一次挥手：客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。</p>
+<p>🙋‍♂️第二次挥手：服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。</p>
+<p>🙋第三次挥手：客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。</p>
+<p>🙋‍♂️第四次挥手：客户端收到服务器的连接释放报文后，必须发出确认，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。</p>
+<h2 id="后话">后话</h2>
+<ul>
+<li>
+<p>关闭连接之所以比建立连接多一步是因为，建立连接的时候服务端收到建立连接的请求后可以直接发送确认号标志（ACK=1）和同步号标志（SYN=1）来确认建立连接，但是关闭的时候，客户端发送关闭请求的时候，可能服务端数据还没有传送完，所以要先发一个确认号标志（ACK=1）表示我收到你要关闭的请求了，但我要先把东西给你发送完，发送完之后再发送一个关闭标示关闭连接</p>
+</li>
+<li>
+<p>TIME_WAIT状态需要经过2MSL才能返回到CLOSE状态是因为网络可能不可靠，客户端发送的确认应答报文服务端没有收到，这个时间是来接受又可能从服务端重发过来的确认报文，如果收到了客户端就重发一次客户端的确认报文，如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接。MSL指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。</p>
+</li>
+</ul>
+
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://twFR.github.io/post/golang-timer">
+              <h3 class="post-title">
+                Golang Timer
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'db306bd8ac595ee09a0e',
+    clientSecret: '7e169f0897298c132e7c038d4d53e8fece891efb',
+    repo: 'twFR.github.io',
+    owner: 'twFR',
+    admin: ['twFR'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  真有意思 绝无可能
+不要慌 问题不大☘
+ | 
+  <a class="rss" href="https://twFR.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
