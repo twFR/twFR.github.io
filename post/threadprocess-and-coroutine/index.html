@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>关于 | 🌟谭先生✨</title>
+<title>Thread、Process and Coroutine | 🌟谭先生✨</title>
 <link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1566113257521">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
@@ -78,30 +78,49 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              关于
+              Thread、Process and Coroutine
             </h2>
             <div class="post-info">
               <time class="post-time">
-                · 2019-01-25 ·
+                · 2019-08-18 ·
               </time>
+              
+                <a href="https://twFR.github.io/tag/m3QjF1XRg" class="post-tag">
+                  # opertion
+                </a>
               
             </div>
             
-              <div class="post-feature-image" style="background-image: url('https://twFR.github.io/post-images/about.JPG')">
-              </div>
-            
             <div class="post-content">
-              <p>如约而至<br>
-是个多美好的词<br>
-等的辛苦<br>
-却从不辜负🍓</p>
-<p>我  一个不高不矮不胖不瘦不富有点小穷的无志青年<br>
-愿生活美好 加油☘️</p>
+              <p>梳理下线程、进程和协程
+一句话总结：每个进程有自己独立的地址空间，分享系统资源；线程访问隶属进程资源，同一进程所有线程共享进程所有资源；协程由程序自身控制，在子程序内部可中断。</p>
+<h2 id="进程">进程</h2>
+<p>一个程序运行就会在内存空间里形成一个独立的内存体，这个内存体有自己独立的地址空间和独立的堆，操作系统会以操作系统会以进程为单位，分配系统资源（CPU时间片、内存等资源），进程是资源分配的最小单位。</p>
+<p>进程所维护的是程序所包含的资源（静态资源）， 如：地址空间，打开的文件句柄集，文件系统状态，信号处理handler等；</p>
+<h2 id="线程">线程</h2>
+<p>线程，有时被称为轻量级进程(Lightweight Process，LWP），是操作系统调度（CPU调度）执行的最小单位。</p>
+<p>线程所维护的运行相关的资源（动态资源），如：运行栈，调度相关的控制信息，待处理的信号集等；</p>
+<p>在创建或撤消进程时，由于系统都要为之分配和回收资源，导致系统的开销明显大于创建或撤消线程时的开销线程有自己的堆栈和局部变量，但线程之间没有单独的地址空间，一个进程死掉就等于所有的线程死掉，所以多进程的程序要比多线程的程序健壮，但在进程切换时，耗费资源较大，效率要差一些。</p>
+<h2 id="协程">协程</h2>
+<p>协程不是被操作系统内核所管理，而完全是由程序所控制（也就是在用户态执行）。这样带来的好处就是性能得到了很大的提升，不会像线程切换那样消耗资源。</p>
+<p>协程在子程序内部是可中断的，然后转而执行别的子程序，在适当的时候再返回来接着执行。</p>
+<p>线程默认的栈是8m，而一个协程只需要几十kb</p>
+<p>极高的执行效率：因为子程序切换不是线程切换，而是由程序自身控制，因此，没有线程切换的开销，和多线程比，线程数量越多，协程的性能优势就越明显；</p>
+<p>不需要多线程的锁机制：因为只有一个线程，也不存在同时写变量冲突，在协程中控制共享资源不加锁，只需要判断状态就好了，所以执行效率比多线程高很多。</p>
 
             </div>
           </article>
         </div>
 
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://twFR.github.io/post/golang-timer">
+              <h3 class="post-title">
+                Golang Timer
+              </h3>
+            </a>
+          </div>
         
 
         
