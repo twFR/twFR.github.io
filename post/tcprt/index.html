@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>TCP reliable transmission | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1566126221181">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1566126389830">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1566126221181" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1566126389830" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -128,19 +128,13 @@
 <li>源/目的端口号: 表示数据是从哪个进程来, 到哪个进程去；</li>
 <li>4字节序列号（seq）/32位确认号（ack）:相互协同，保证可靠性，保证按序到达。</li>
 <li>4位TCP报头长度: 表示该TCP头部有多少个32位bit(有多少个4字节); 所以TCP头部最大长度是15 * 4 = 60</li>
-<li>6位标志位:</li>
-</ul>
-<blockquote>
-<blockquote>
-<p>URG: 紧急指针是否有效
+<li>6位标志位:
+URG: 紧急指针是否有效
 ACK: 确认号是否有效
 PSH: 提示接收端应用程序立刻从TCP缓冲区把数据读走
 RST: 对方要求重新建立连接，我们把携带RST标识的称为复位报文段
 SYN: 请求建立连接，我们把携带SYN标识的称为同步报文段
-FIN: 通知对方, 本端要关闭了, 我们称携带FIN标识的为结束报文段</p>
-</blockquote>
-</blockquote>
-<ul>
+FIN: 通知对方, 本端要关闭了, 我们称携带FIN标识的为结束报文段</li>
 <li>16位窗口大小:自己的接收缓冲区大小（没错，就是前面流量控制的窗口）</li>
 <li>6位校验和: 发送端填充, CRC校验. 接收端校验不通过, 则认为数据有问题. 此处的检验和不光包含TCP首部, 也包含TCP数据部分.</li>
 <li>16位紧急指针: 标识哪部分数据是紧急数据
