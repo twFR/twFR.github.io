@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>关于 | 🌟谭先生✨</title>
+<title>Bubble Sort | 🌟谭先生✨</title>
 <link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1573655921766">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
@@ -78,30 +78,122 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              关于
+              Bubble Sort
             </h2>
             <div class="post-info">
               <time class="post-time">
-                · 2019-01-25 ·
+                · 2019-11-13 ·
               </time>
+              
+                <a href="https://twFR.github.io/tag/kmZn9BU_t" class="post-tag">
+                  # practice
+                </a>
               
             </div>
             
-              <div class="post-feature-image" style="background-image: url('https://twFR.github.io/post-images/about.JPG')">
-              </div>
-            
             <div class="post-content">
-              <p>如约而至<br>
-是个多美好的词<br>
-等的辛苦<br>
-却从不辜负🍓</p>
-<p>我  一个不高不矮不胖不瘦不富有点小穷的无志青年<br>
-愿生活美好 加油☘️</p>
+              <h2 id="需求">需求</h2>
+<p>输入带存储单位的数值，排序后输出<br>
+1G=1000M；1T=1000G</p>
+<h2 id="举例">举例</h2>
+<p>（第一行为将要输入的数值个数）<br>
+输入：</p>
+<blockquote>
+<p>3<br>
+1G<br>
+50M<br>
+2T</p>
+</blockquote>
+<p>输出：</p>
+<blockquote>
+<p>50M<br>
+1G<br>
+2T</p>
+</blockquote>
+<h2 id="解题思路">解题思路</h2>
+<ul>
+<li>用一个底层数组为个数为num的切片放传进来的存储数值</li>
+<li>将数值单位转化为对应个数的0，转化后的值作为map的key，转化前的为map的value</li>
+<li>冒泡排序将切片排序</li>
+<li>遍历切片，拿到map的key，打印对应的value，完事收工</li>
+</ul>
+<h2 id="代码实现">代码实现</h2>
+<pre><code>package main
+
+import (
+	&quot;bufio&quot;
+	&quot;fmt&quot;
+	&quot;os&quot;
+	&quot;strconv&quot;
+	&quot;strings&quot;
+)
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		input1, _, _ := reader.ReadLine()
+
+		inputLen := len(input1)
+		if inputLen == 0 {
+			break
+		}
+
+		num, _ := strconv.Atoi(string(input1))
+		inputArr := make([]string,num)
+		memoryMp := make(map[string]string)
+		for i := 0; i &lt; num; i++ {
+			inputNum, _, _ := reader.ReadLine()
+			inputArr[i] = string(inputNum)
+		}
+
+		for i := 0; i &lt; num; i++ {
+			temp := strings.Replace(inputArr[i], &quot;M&quot;, &quot;&quot;, -1)
+			temp = strings.Replace(temp, &quot;G&quot;, &quot;000&quot;, -1)
+			temp = strings.Replace(temp, &quot;T&quot;, &quot;000000&quot;, -1)
+			memoryMp[temp] = inputArr[i]
+			inputArr[i] = temp
+		}
+		fmt.Println(inputArr)
+		fmt.Println(memoryMp)
+		for i := 0; i &lt; num; i++ {
+			flag := false
+			for j := 1; j &lt; num-i; j++ {
+				pre, _ := strconv.Atoi(inputArr[j-1])
+				next, _ := strconv.Atoi(inputArr[j])
+				if pre &gt; next {
+					temp := inputArr[j-1]
+					inputArr[j-1] = inputArr[j]
+					inputArr[j] = temp
+					flag = true
+				}
+			}
+			if !flag {
+				break
+			}
+		}
+		fmt.Println(&quot;正确的排序为：&quot;)
+		fmt.Println(inputArr)
+		for i := 0; i &lt; num; i++ {
+			fmt.Println(memoryMp[inputArr[i]])
+		}
+	}
+}
+</code></pre>
+<p>搞定！</p>
 
             </div>
           </article>
         </div>
 
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://twFR.github.io/post/threadprocess-and-coroutine">
+              <h3 class="post-title">
+                Thread、Process and Coroutine
+              </h3>
+            </a>
+          </div>
         
 
         

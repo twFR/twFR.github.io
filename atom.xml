@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2019-08-18T11:10:10.936Z</updated>
+    <updated>2019-11-13T14:38:45.344Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,6 +10,13 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 🌟谭先生✨</rights>
+    <entry>
+        <title type="html"><![CDATA[Bubble Sort]]></title>
+        <id>https://twFR.github.io/post/bubble-sort</id>
+        <link href="https://twFR.github.io/post/bubble-sort">
+        </link>
+        <updated>2019-11-13T12:06:43.000Z</updated>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Thread、Process and Coroutine]]></title>
         <id>https://twFR.github.io/post/threadprocess-and-coroutine</id>
