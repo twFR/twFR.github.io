@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2019-11-13T14:40:59.425Z</updated>
+    <updated>2019-11-14T14:19:13.498Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -11,11 +11,191 @@
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 🌟谭先生✨</rights>
     <entry>
+        <title type="html"><![CDATA[Multiplication by large numbers]]></title>
+        <id>https://twFR.github.io/post/multiplication-by-large-numbers</id>
+        <link href="https://twFR.github.io/post/multiplication-by-large-numbers">
+        </link>
+        <updated>2019-11-14T14:02:22.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="需求">需求</h2>
+<p>求n的阶乘（0&lt;n&lt;1000）</p>
+<h2 id="示例">示例</h2>
+<p>输入：</p>
+<blockquote>
+<p>2<br>
+3</p>
+</blockquote>
+<p>输出：</p>
+<blockquote>
+<p>2<br>
+6</p>
+</blockquote>
+<h2 id="解题思路">解题思路</h2>
+<p>普通的数据类型肯定没法承载精确的大数的阶层，所以这实际就是一个大数相乘算法</p>
+<ul>
+<li>用一个数组来装大数的每一位</li>
+<li>用数组的每一个值去乘被乘数</li>
+<li>将数组从后往前进位然后留值，因为数字相邻两位相差10的倍数，就以10进1，例如数组最后一位为102，则向前进10，留2</li>
+<li>最后顺序打出不换行的数组每个值就是结果，需要注意的是数组的长度</li>
+</ul>
+<pre><code>func multiplication(largeNumber [1000]int, number int) [1000]int {
+	for i := 0; i &lt; len(largeNumber); i++ {
+		largeNumber[i] = largeNumber[i] * number
+	}
+	for i := len(largeNumber) - 1; i &gt; 0; i-- {
+		// 进位
+		largeNumber[i-1] = largeNumber[i]/10 + largeNumber[i-1]
+		// 留值
+		largeNumber[i] = largeNumber[i] % 10
+	}
+	return largeNumber
+}
+</code></pre>
+<h2 id="完整实现">完整实现</h2>
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;os&quot;
+)
+
+func main() {
+	for {
+		var num int
+		var largeNumber [1000]int
+		n, err := fmt.Scanf(&quot;%d&quot;, &amp;num)
+		if n != 1 || err != nil {
+			os.Exit(1)
+		}
+		// 最后一位给1
+		largeNumber[len(largeNumber)-1] = 1
+		for i := 1; i &lt;= num; i++ {
+			largeNumber = multiplication(largeNumber, i)
+		}
+		// 数组中不为0的第一个数
+		min := 0
+		for i := 0; i &lt; len(largeNumber); i++ {
+			if largeNumber[i] != 0 {
+				min = i
+				break
+			}
+		}
+		for i := min; i &lt; len(largeNumber); i++ {
+			fmt.Print(largeNumber[i])
+		}
+		fmt.Println()
+	}
+}
+
+func multiplication(largeNumber [1000]int, number int) [1000]int {
+	for i := 0; i &lt; len(largeNumber); i++ {
+		largeNumber[i] = largeNumber[i] * number
+	}
+	for i := len(largeNumber) - 1; i &gt; 0; i-- {
+		// 进位
+		largeNumber[i-1] = largeNumber[i]/10 + largeNumber[i-1]
+		// 留值
+		largeNumber[i] = largeNumber[i] % 10
+	}
+	return largeNumber
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[Bubble Sort]]></title>
         <id>https://twFR.github.io/post/bubble-sort</id>
         <link href="https://twFR.github.io/post/bubble-sort">
         </link>
         <updated>2019-11-13T12:06:43.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="需求">需求</h2>
+<p>输入带存储单位的数值，排序后输出<br>
+1G=1000M；1T=1000G</p>
+<h2 id="举例">举例</h2>
+<p>（第一行为将要输入的数值个数）<br>
+输入：</p>
+<blockquote>
+<p>3<br>
+1G<br>
+50M<br>
+2T</p>
+</blockquote>
+<p>输出：</p>
+<blockquote>
+<p>50M<br>
+1G<br>
+2T</p>
+</blockquote>
+<h2 id="解题思路">解题思路</h2>
+<ul>
+<li>用一个底层数组为个数为num的切片放传进来的存储数值</li>
+<li>将数值单位转化为对应个数的0，转化后的值作为map的key，转化前的为map的value</li>
+<li>冒泡排序将切片排序</li>
+<li>遍历切片，拿到map的key，打印对应的value，完事收工</li>
+</ul>
+<h2 id="代码实现">代码实现</h2>
+<pre><code>package main
+
+import (
+	&quot;bufio&quot;
+	&quot;fmt&quot;
+	&quot;os&quot;
+	&quot;strconv&quot;
+	&quot;strings&quot;
+)
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		input1, _, _ := reader.ReadLine()
+
+		inputLen := len(input1)
+		if inputLen == 0 {
+			break
+		}
+
+		num, _ := strconv.Atoi(string(input1))
+		inputArr := make([]string,num)
+		memoryMp := make(map[string]string)
+		for i := 0; i &lt; num; i++ {
+			inputNum, _, _ := reader.ReadLine()
+			inputArr[i] = string(inputNum)
+		}
+
+		for i := 0; i &lt; num; i++ {
+			temp := strings.Replace(inputArr[i], &quot;M&quot;, &quot;&quot;, -1)
+			temp = strings.Replace(temp, &quot;G&quot;, &quot;000&quot;, -1)
+			temp = strings.Replace(temp, &quot;T&quot;, &quot;000000&quot;, -1)
+			memoryMp[temp] = inputArr[i]
+			inputArr[i] = temp
+		}
+		fmt.Println(inputArr)
+		fmt.Println(memoryMp)
+		for i := 0; i &lt; num; i++ {
+			flag := false
+			for j := 1; j &lt; num-i; j++ {
+				pre, _ := strconv.Atoi(inputArr[j-1])
+				next, _ := strconv.Atoi(inputArr[j])
+				if pre &gt; next {
+					temp := inputArr[j-1]
+					inputArr[j-1] = inputArr[j]
+					inputArr[j] = temp
+					flag = true
+				}
+			}
+			if !flag {
+				break
+			}
+		}
+		fmt.Println(&quot;正确的排序为：&quot;)
+		fmt.Println(inputArr)
+		for i := 0; i &lt; num; i++ {
+			fmt.Println(memoryMp[inputArr[i]])
+		}
+	}
+}
+</code></pre>
+<p>搞定！</p>
+]]></content>
     </entry>
     <entry>
         <title type="html"><![CDATA[Thread、Process and Coroutine]]></title>
@@ -23,6 +203,44 @@
         <link href="https://twFR.github.io/post/threadprocess-and-coroutine">
         </link>
         <updated>2019-07-18T02:16:08.000Z</updated>
+        <content type="html"><![CDATA[<p>梳理下线程、进程和协程<br>
+一句话总结：每个进程有自己独立的地址空间，分享系统资源；线程访问隶属进程资源，同一进程所有线程共享进程所有资源；协程由程序自身控制，在子程序内部可中断。</p>
+<h2 id="进程">进程</h2>
+<p>一个程序运行就会在内存空间里形成一个独立的内存体，这个内存体有自己独立的地址空间和独立的堆，操作系统会以操作系统会以进程为单位，分配系统资源（CPU时间片、内存等资源），进程是资源分配的最小单位。</p>
+<p>进程所维护的是程序所包含的资源（静态资源）， 如：地址空间，打开的文件句柄集，文件系统状态，信号处理handler等；</p>
+<h2 id="线程">线程</h2>
+<p>线程，有时被称为轻量级进程(Lightweight Process，LWP），是操作系统调度（CPU调度）执行的最小单位。</p>
+<p>线程所维护的运行相关的资源（动态资源），如：运行栈，调度相关的控制信息，待处理的信号集等；</p>
+<p>在创建或撤消进程时，由于系统都要为之分配和回收资源，导致系统的开销明显大于创建或撤消线程时的开销线程有自己的堆栈和局部变量，但线程之间没有单独的地址空间，一个进程死掉就等于所有的线程死掉，所以多进程的程序要比多线程的程序健壮，但在进程切换时，耗费资源较大，效率要差一些。</p>
+<h2 id="协程">协程</h2>
+<p>协程不是被操作系统内核所管理，而完全是由程序所控制（也就是在用户态执行）。这样带来的好处就是性能得到了很大的提升，不会像线程切换那样消耗资源。</p>
+<p>协程在子程序内部是可中断的，然后转而执行别的子程序，在适当的时候再返回来接着执行。</p>
+<p>线程默认的栈是8m，而一个协程只需要几十kb</p>
+<p>极高的执行效率：因为子程序切换不是线程切换，而是由程序自身控制，因此，没有线程切换的开销，和多线程比，线程数量越多，协程的性能优势就越明显；</p>
+<p>不需要多线程的锁机制：因为只有一个线程，也不存在同时写变量冲突，在协程中控制共享资源不加锁，只需要判断状态就好了，所以执行效率比多线程高很多。</p>
+<pre><code>type work struct {
+	x, y, z int
+}
+
+func worker(in &lt;- chan *work, out chan &lt;-  *work) {
+	for w := range in{
+		w.z = w.x * w.y
+		Sleep(w.z)
+		out &lt;- w
+	}
+	}
+
+func Run()  {
+	in , out:= make(chan *work), make(chan *work)
+	for i:= 0; i&lt; NumWorks; i++{
+		go worker(in, out)
+	}
+	go sendLotsOfWork(in)
+	receiveLotsOfResults(out)
+
+}
+</code></pre>
+]]></content>
     </entry>
     <entry>
         <title type="html"><![CDATA[TCP reliable transmission]]></title>
@@ -30,6 +248,76 @@
         <link href="https://twFR.github.io/post/tcprt">
         </link>
         <updated>2019-06-23T07:29:34.000Z</updated>
+        <content type="html"><![CDATA[<p>🏫一直以来对TCP连接的可靠性，三次握手，四次挥手有过了解，但要组织语言说出来好像还真不容易，今天就系统的记录一下，以供更加深入的理解。</p>
+<h2 id="为什么说tcp可靠">为什么说TCP可靠</h2>
+<p>🔗说到tcp可靠性，就要先来看看tcp有哪些特点了，tcp是面向连接的，面向字节流 的连接，能通过丢包重发,超时重试等方式保证可靠传输，且支持全双工通信，支持端口到端口的连接，每一条TCP连接只能有两个端点。<br>
+<font size="2">ps：全双工指可以同时（瞬时）进行信号的双向传输（A→B且B→A）。指A→B的同时B→A，是瞬时同步的。</font><br /></p>
+<p>🔐tcp的可靠性是通过下面几点来实现的</p>
+<ul>
+<li>
+<p>校验和 端到端的校验和，由发送端计算，然后由接收端验证。其目的是为了发现TCP首部和数据在发送端到接收端之间发生的任何改动。如果接收方检测到校验和有差错，则TCP段会被直接丢弃。</p>
+</li>
+<li>
+<p>序列号（按序到达）</p>
+</li>
+<li>
+<p>确认应答（ACK）机制  TCP将每个字节的数据都进行了编号，即为序列号，每一个ACK都带有对应的确认序列号, 意思是告诉发送者, 我已经收到了哪些数据，下一次你从哪里开始发。</p>
+</li>
+<li>
+<p>超时重传机制  在一个特定时间间隔内没有收到发来的确认应答, 会进行重发。超时的时间长短是通过动态确定的，以500ms为一个单位进行控制，如果重发一次之后, 仍然得不到应答, 等待 2*500ms 后再进行重传，依次类推, 以指数形式递增， 累计到一定的重传次数, TCP认为网络或者对端主机出现异常, 强制关闭连接。</p>
+</li>
+<li>
+<p>流量控制  当接受方来不及处理发送方的数据，能提示发送方降低发送的速率，防止包丢失 ；通过窗口来控制 （窗口大小字段越大, 说明网络的吞吐量越高，窗口在下文报文段里的16位字段）</p>
+</li>
+<li>
+<p>拥塞控制 一开始不确定网络状态，如果一下发送大量数据，可能会导致网络拥堵，所以控制从小到大，慢慢增大控制控制拥塞窗口数值，具体实现如下：<br>
+1）TCP连接初始化，将拥塞窗口设置为1<br>
+2）执行慢开始算法，cwind（拥塞窗口）按指数规律增长，直到cwind == ssthress（慢开始门限）开始执行拥塞避免算法，cwnd按线性规律增长<br>
+3）当网络发生拥塞，把ssthresh值更新为拥塞前ssthresh值的一半，cwnd重新设置为1，按照步骤（2）执行。</p>
+</li>
+</ul>
+<p>👍通过这六个策略，保障了tcp连接的可靠性</p>
+<h2 id="看看tcp报文段格式">看看TCP报文段格式</h2>
+<figure data-type="image" tabindex="1"><img src="http://img4.imgtn.bdimg.com/it/u=2627348429,2184604078&amp;fm=214&amp;gp=0.jpg" alt="TCP报文段" title="TCP报文段"></figure>
+<p>👨🏻‍💻解释下各个字段用途：</p>
+<ul>
+<li>源/目的端口号: 表示数据是从哪个进程来, 到哪个进程去；</li>
+<li>4字节序列号（seq）/32位确认号（ack）:相互协同，保证可靠性，保证按序到达。</li>
+<li>4位TCP报头长度: 表示该TCP头部有多少个32位bit(有多少个4字节); 所以TCP头部最大长度是15 * 4 = 60</li>
+<li>6位标志位:<br>
+URG: 紧急指针是否有效<br>
+ACK: 确认号是否有效<br>
+PSH: 提示接收端应用程序立刻从TCP缓冲区把数据读走<br>
+RST: 对方要求重新建立连接，我们把携带RST标识的称为复位报文段<br>
+SYN: 请求建立连接，我们把携带SYN标识的称为同步报文段<br>
+FIN: 通知对方, 本端要关闭了, 我们称携带FIN标识的为结束报文段</li>
+<li>16位窗口大小:自己的接收缓冲区大小（没错，就是前面流量控制的窗口）</li>
+<li>6位校验和: 发送端填充, CRC校验. 接收端校验不通过, 则认为数据有问题. 此处的检验和不光包含TCP首部, 也包含TCP数据部分.</li>
+<li>16位紧急指针: 标识哪部分数据是紧急数据<br>
+PS：ACK、SYN和FIN这些大写的单词表示标志位，其值要么是1，要么是0；ack、seq小写的单词表示序号。</li>
+</ul>
+<h2 id="tcp建立连接三次握手">TCP建立连接（三次握手）</h2>
+<p><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3554453119,3518152184&amp;fm=15&amp;gp=0.jpg" alt="三次握手" title="三次握手"><br>
+🤝第一次握手：建立连接时，客户端【CLOSED -&gt; SYN_SENT】发送syn包（SYN=1，seq=x）到服务器，并进入SYN_SENT状态，等待服务器【CLOSED-&gt;LISTEN】确认；SYN：同步序列编号（Synchronize Sequence Numbers）。</p>
+<p>🤝第二次握手：服务器收到syn包，必须确认客户的SYN，同时服务器【LISTEN-&gt;SYN_RCVD】也发送一个SYN包（SYN=1，ACK=1，seq=y，ack=x+1），此时服务器进入SYN_RCVD状态；</p>
+<p>🤝第三次握手：客户端收到服务器的同步包，向服务器发送确认包ACK(ack=y+1），此包发送完毕，客户端【SYN_SENT -&gt; ESTABLISHED】和服务器【SYN_RCVD -&gt; ESTABLISHED】进入ESTABLISHED（TCP连接成功）状态，完成三次握手。</p>
+<p><font size="3">ps：发送报文段确认号实际就为收到的报文段序列号加1，以保证按序到达</font><br /></p>
+<h2 id="tcp关闭连接四次挥手">TCP关闭连接（四次挥手）</h2>
+<p><img src="http://img0.ph.126.net/silia0LWWddxSzcvFjPHQQ==/6632311313349802875.png" alt="三次握手" title="三次握手"><br>
+🙋第一次挥手：客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。</p>
+<p>🙋‍♂️第二次挥手：服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。</p>
+<p>🙋第三次挥手：客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。</p>
+<p>🙋‍♂️第四次挥手：客户端收到服务器的连接释放报文后，必须发出确认，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。</p>
+<h2 id="后话">后话</h2>
+<ul>
+<li>
+<p>关闭连接之所以比建立连接多一步是因为，建立连接的时候服务端收到建立连接的请求后可以直接发送确认号标志（ACK=1）和同步号标志（SYN=1）来确认建立连接，但是关闭的时候，客户端发送关闭请求的时候，可能服务端数据还没有传送完，所以要先发一个确认号标志（ACK=1）表示我收到你要关闭的请求了，但我要先把东西给你发送完，发送完之后再发送一个关闭标示关闭连接</p>
+</li>
+<li>
+<p>TIME_WAIT状态需要经过2MSL才能返回到CLOSE状态是因为网络可能不可靠，客户端发送的确认应答报文服务端没有收到，这个时间是来接受又可能从服务端重发过来的确认报文，如果收到了客户端就重发一次客户端的确认报文，如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接。MSL指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。</p>
+</li>
+</ul>
+]]></content>
     </entry>
     <entry>
         <title type="html"><![CDATA[Golang Timer]]></title>
@@ -37,6 +325,28 @@
         <link href="https://twFR.github.io/post/golang-timer">
         </link>
         <updated>2019-06-09T09:53:16.000Z</updated>
+        <content type="html"><![CDATA[<p>我们trm里面有个kube-system项目，由于是k8s的内置namespace，所以创建的时间比较早，在当时的情况下没有办法在cfe创建icagent的守护进程，所以以前没有默认开启平台监控这个功能。</p>
+<p>然后有同事反应必须要开启，不然就不能做到日志转储，导致磁盘空间占满，于是我想到了一个办法，之所以没办法开启，是因为当时的条件创不出来，但是等到环境安装到一定进度后，有条件了就可以创建出来了。可以设计一个定时器，在创建这个项目的时候就开始创这个icagent ，每隔20秒创建一次，直到创建成功。<br>
+定时器设计如下：</p>
+<pre><code>func CreateProject() {
+	PresetProject() //创建kube-system
+	go func() {
+		isSucceed := false //设置标志位
+		logger.info(&quot;start try to create icagent daemonset&quot;)
+		for !isSucceed {
+			err := createIcagent()
+			if err == nil {
+				isSucceed = true
+				logger.info(&quot;create icagent daemonset succeed&quot;)
+			}
+			time.Sleep(20 * time.Second)
+		}
+	}()
+	return
+}
+</code></pre>
+<p>一个很简单的定时器，用isSucceed作为标志位，如果是失败的就一直循环创建，一旦成功，就退出了这个goroutine。</p>
+]]></content>
     </entry>
     <entry>
         <title type="html"><![CDATA[Original Inteneion]]></title>
@@ -44,5 +354,15 @@
         <link href="https://twFR.github.io/post/original-inteneion">
         </link>
         <updated>2019-05-26T15:38:39.000Z</updated>
+        <content type="html"><![CDATA[<p>作为一个重度拖延症患者<br>
+是时候开始给自己的生活一点目标了！<br>
+最近想换工作 不停的在学习 才发现自己真的low到爆<br>
+讲道理 先立一个flag🇺🇳<br>
+今年一定要脱坑</p>
+<p><s>同时 今年能不能脱单呢  哈哈</s></p>
+<p>花了一下午搭了这个blog<br>
+希望能不忘自己的初衷<br>
+学习 奋斗 加油！</p>
+<img src ="http://wx3.sinaimg.cn/large/0068Lfdely1frpye1fsgsj30g20g20t9.jpg" width = "100" height = "100" div align=left>]]></content>
     </entry>
 </feed>

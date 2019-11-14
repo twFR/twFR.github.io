@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Golang Timer | 🌟谭先生✨</title>
+<title>Multiplication by large numbers | 🌟谭先生✨</title>
 <link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1573741149213">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
@@ -78,41 +78,99 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              Golang Timer
+              Multiplication by large numbers
             </h2>
             <div class="post-info">
               <time class="post-time">
-                · 2019-06-09 ·
+                · 2019-11-14 ·
               </time>
-              
-                <a href="https://twFR.github.io/tag/Z7--HtZrc" class="post-tag">
-                  # golang
-                </a>
               
             </div>
             
             <div class="post-content">
-              <p>我们trm里面有个kube-system项目，由于是k8s的内置namespace，所以创建的时间比较早，在当时的情况下没有办法在cfe创建icagent的守护进程，所以以前没有默认开启平台监控这个功能。</p>
-<p>然后有同事反应必须要开启，不然就不能做到日志转储，导致磁盘空间占满，于是我想到了一个办法，之所以没办法开启，是因为当时的条件创不出来，但是等到环境安装到一定进度后，有条件了就可以创建出来了。可以设计一个定时器，在创建这个项目的时候就开始创这个icagent ，每隔20秒创建一次，直到创建成功。<br>
-定时器设计如下：</p>
-<pre><code>func CreateProject() {
-	PresetProject() //创建kube-system
-	go func() {
-		isSucceed := false //设置标志位
-		logger.info(&quot;start try to create icagent daemonset&quot;)
-		for !isSucceed {
-			err := createIcagent()
-			if err == nil {
-				isSucceed = true
-				logger.info(&quot;create icagent daemonset succeed&quot;)
-			}
-			time.Sleep(20 * time.Second)
-		}
-	}()
-	return
+              <h2 id="需求">需求</h2>
+<p>求n的阶乘（0&lt;n&lt;1000）</p>
+<h2 id="示例">示例</h2>
+<p>输入：</p>
+<blockquote>
+<p>2<br>
+3</p>
+</blockquote>
+<p>输出：</p>
+<blockquote>
+<p>2<br>
+6</p>
+</blockquote>
+<h2 id="解题思路">解题思路</h2>
+<p>普通的数据类型肯定没法承载精确的大数的阶层，所以这实际就是一个大数相乘算法</p>
+<ul>
+<li>用一个数组来装大数的每一位</li>
+<li>用数组的每一个值去乘被乘数</li>
+<li>将数组从后往前进位然后留值，因为数字相邻两位相差10的倍数，就以10进1，例如数组最后一位为102，则向前进10，留2</li>
+<li>最后顺序打出不换行的数组每个值就是结果，需要注意的是数组的长度</li>
+</ul>
+<pre><code>func multiplication(largeNumber [1000]int, number int) [1000]int {
+	for i := 0; i &lt; len(largeNumber); i++ {
+		largeNumber[i] = largeNumber[i] * number
+	}
+	for i := len(largeNumber) - 1; i &gt; 0; i-- {
+		// 进位
+		largeNumber[i-1] = largeNumber[i]/10 + largeNumber[i-1]
+		// 留值
+		largeNumber[i] = largeNumber[i] % 10
+	}
+	return largeNumber
 }
 </code></pre>
-<p>一个很简单的定时器，用isSucceed作为标志位，如果是失败的就一直循环创建，一旦成功，就退出了这个goroutine。</p>
+<h2 id="完整实现">完整实现</h2>
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;os&quot;
+)
+
+func main() {
+	for {
+		var num int
+		var largeNumber [1000]int
+		n, err := fmt.Scanf(&quot;%d&quot;, &amp;num)
+		if n != 1 || err != nil {
+			os.Exit(1)
+		}
+		// 最后一位给1
+		largeNumber[len(largeNumber)-1] = 1
+		for i := 1; i &lt;= num; i++ {
+			largeNumber = multiplication(largeNumber, i)
+		}
+		// 数组中不为0的第一个数
+		min := 0
+		for i := 0; i &lt; len(largeNumber); i++ {
+			if largeNumber[i] != 0 {
+				min = i
+				break
+			}
+		}
+		for i := min; i &lt; len(largeNumber); i++ {
+			fmt.Print(largeNumber[i])
+		}
+		fmt.Println()
+	}
+}
+
+func multiplication(largeNumber [1000]int, number int) [1000]int {
+	for i := 0; i &lt; len(largeNumber); i++ {
+		largeNumber[i] = largeNumber[i] * number
+	}
+	for i := len(largeNumber) - 1; i &gt; 0; i-- {
+		// 进位
+		largeNumber[i-1] = largeNumber[i]/10 + largeNumber[i-1]
+		// 留值
+		largeNumber[i] = largeNumber[i] % 10
+	}
+	return largeNumber
+}
+</code></pre>
 
             </div>
           </article>
@@ -121,9 +179,9 @@
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://twFR.github.io/post/original-inteneion">
+            <a href="https://twFR.github.io/post/bubble-sort">
               <h3 class="post-title">
-                Original Inteneion
+                Bubble Sort
               </h3>
             </a>
           </div>
