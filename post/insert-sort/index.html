@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Golang Timer | 🌟谭先生✨</title>
+<title>Insert sort | 🌟谭先生✨</title>
 <link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1573836585069">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
@@ -78,41 +78,117 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              Golang Timer
+              Insert sort
             </h2>
             <div class="post-info">
               <time class="post-time">
-                · 2019-06-09 ·
+                · 2019-11-15 ·
               </time>
               
-                <a href="https://twFR.github.io/tag/Z7--HtZrc" class="post-tag">
-                  # golang
+                <a href="https://twFR.github.io/tag/kmZn9BU_t" class="post-tag">
+                  # practice
                 </a>
               
             </div>
             
             <div class="post-content">
-              <p>我们trm里面有个kube-system项目，由于是k8s的内置namespace，所以创建的时间比较早，在当时的情况下没有办法在cfe创建icagent的守护进程，所以以前没有默认开启平台监控这个功能。</p>
-<p>然后有同事反应必须要开启，不然就不能做到日志转储，导致磁盘空间占满，于是我想到了一个办法，之所以没办法开启，是因为当时的条件创不出来，但是等到环境安装到一定进度后，有条件了就可以创建出来了。可以设计一个定时器，在创建这个项目的时候就开始创这个icagent ，每隔20秒创建一次，直到创建成功。<br>
-定时器设计如下：</p>
-<pre><code>func CreateProject() {
-	PresetProject() //创建kube-system
-	go func() {
-		isSucceed := false //设置标志位
-		logger.info(&quot;start try to create icagent daemonset&quot;)
-		for !isSucceed {
-			err := createIcagent()
-			if err == nil {
-				isSucceed = true
-				logger.info(&quot;create icagent daemonset succeed&quot;)
+              <h2 id="需求">需求</h2>
+<p>输入n个数字，（第一行数字表示将要输入数字的个数）<br>
+按从小到大的顺序排序后一行输出</p>
+<h2 id="示例">示例</h2>
+<p>输入：</p>
+<blockquote>
+<p>5<br>
+12<br>
+45<br>
+2<br>
+14<br>
+1</p>
+</blockquote>
+<p>输出：</p>
+<blockquote>
+<p>1 2 12 14 45</p>
+</blockquote>
+<h2 id="解题思路">解题思路</h2>
+<p>今天使用插入排序来解决这个问题</p>
+<ul>
+<li>循环需要排序的数组</li>
+<li>从第二个数字开始，和前一个比较，如果比前一个小，就说明这第i个数字n需要重新排序</li>
+<li>将这个数字和前面的所有数字比较，当n比第j个数字位置小的时候（j&lt;i），则说明这个j位置就是n需要插入的位置</li>
+<li>将j位置到i-1位置的数字全部顺序向后移动一个位置，即将【i-1】赋给【i】，最后将最开始的【i】赋给【j】</li>
+<li>循环完数组则排序完毕，over</li>
+</ul>
+<pre><code>func insertSort(disorderNumber []int) []int {
+	for i := 1; i &lt; len(disorderNumber); i++ {
+		if disorderNumber[i] &lt; disorderNumber[i-1] {
+			for j := 0; j &lt; i; j++ {
+				if disorderNumber[j] &gt; disorderNumber[i] {
+					// 插入位置
+					temp := disorderNumber[i]
+					// 将插入位置后面的数到需要插入的数整体后移一位
+					for k := i; k &gt; j; k-- {
+						disorderNumber[k] = disorderNumber[k-1]
+					}
+					disorderNumber[j] = temp
+				}
+				// 如果找到插入位置，则不需要再向后面循环
+				break
 			}
-			time.Sleep(20 * time.Second)
 		}
-	}()
-	return
+	}
+	return disorderNumber
 }
 </code></pre>
-<p>一个很简单的定时器，用isSucceed作为标志位，如果是失败的就一直循环创建，一旦成功，就退出了这个goroutine。</p>
+<h2 id="完整代码">完整代码</h2>
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;os&quot;
+	&quot;strconv&quot;
+)
+
+func main() {
+	var num int
+	n, err := fmt.Scanf(&quot;%d&quot;, &amp;num)
+	if n != 1 || err != nil {
+		os.Exit(1)
+	}
+	disorderNumber := make([]int, num)
+	for i := 0; i &lt; num; i++ {
+		n, err := fmt.Scanf(&quot;%d&quot;, &amp;disorderNumber[i])
+		if n != 1 || err != nil {
+			fmt.Println(n,err)
+			os.Exit(1)
+		}
+	}
+	orderNumber := insertSort(disorderNumber)
+	for i := 0; i &lt; len(orderNumber); i++ {
+		fmt.Print(strconv.Itoa(orderNumber[i]) + &quot; &quot;)
+	}
+}
+
+func insertSort(disorderNumber []int) []int {
+	for i := 1; i &lt; len(disorderNumber); i++ {
+		if disorderNumber[i] &lt; disorderNumber[i-1] {
+			for j := 0; j &lt; i; j++ {
+				if disorderNumber[j] &gt; disorderNumber[i] {
+					// 插入位置
+					temp := disorderNumber[i]
+					// 将插入位置后面的数到需要插入的数整体后移一位
+					for k := i; k &gt; j; k-- {
+						disorderNumber[k] = disorderNumber[k-1]
+					}
+					disorderNumber[j] = temp
+				}
+				// 如果找到插入位置，则不需要再向后面循环
+				break
+			}
+		}
+	}
+	return disorderNumber
+}
+</code></pre>
 
             </div>
           </article>
@@ -121,9 +197,9 @@
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://twFR.github.io/post/original-inteneion">
+            <a href="https://twFR.github.io/post/multiplication-by-large-numbers">
               <h3 class="post-title">
-                Original Inteneion
+                Multiplication by large numbers
               </h3>
             </a>
           </div>
