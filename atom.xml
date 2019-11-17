@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2019-11-15T16:53:38.877Z</updated>
+    <updated>2019-11-17T17:59:49.251Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,6 +10,101 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 🌟谭先生✨</rights>
+    <entry>
+        <title type="html"><![CDATA[binary search]]></title>
+        <id>https://twFR.github.io/post/binary-search</id>
+        <link href="https://twFR.github.io/post/binary-search">
+        </link>
+        <updated>2019-11-17T12:43:15.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="需求">需求</h2>
+<p>小Q的父母要出差N天，走之前给小Q留下了M块巧克力。小Q决定每天吃的巧克力数量不少于前一天的一半，但是他又不想在父母回来之前把巧克力吃完，请问他<font color=red>第</font>一天<font color=red>最多</font>能吃多少块蛋糕<br>
+N&lt;=50000,N&lt;M&lt;100000</p>
+<h2 id="示例">示例</h2>
+<p>输入：</p>
+<blockquote>
+<p>3 7<br>
+4 7</p>
+</blockquote>
+<p>输出：</p>
+<blockquote>
+<p>4<br>
+3</p>
+</blockquote>
+<h2 id="解题思路">解题思路</h2>
+<ul>
+<li>本题可以想成，我从1～M块巧克力中选出一块来，这块巧克力就是我第一天最多能吃的巧克力</li>
+<li>那这个选出来的有什么条件需要满足呢：要满足我选出来的这个是第一天最多能吃的，那么就是最后几天都要吃最少的，但又要满足不少于前一天的一半，所以就是刚好吃前一天的一半。注意的是，这里要吃就是一整块，不存在是吃几分之一块，强迫症很舒服</li>
+<li>那就是我用二分查找法去选一个巧克力数出来，去看是否满足条件</li>
+<li>这个条件呢就是你每天吃的加起来刚好或者说小于你的总巧克力数，不能饿死嘛，保证每天都有吃的</li>
+</ul>
+<h2 id="代码实现">代码实现</h2>
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;math&quot;
+	&quot;os&quot;
+)
+
+// 出差天数
+var N int
+
+// 巧克力个数
+var M int
+
+func main() {
+	for {
+		num, err := fmt.Scanf(&quot;%d %d&quot;, &amp;N, &amp;M)
+		if num != 2 || err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		search()
+	}
+}
+
+// 假如第一天吃n个,计算总共吃了多少个
+func sum(n int) (m int) {
+	for i := 0; i &lt; N; i++ {
+		m =m + n
+		n = int(math.Ceil(float64 (n) / 2))
+	}
+	return m
+}
+
+// 二分查找满足的条件
+func search() {
+	begin := 1
+	end := M
+	mid := 0
+	if N == 1 {
+		fmt.Println(M)
+		return
+	}
+	for i := 0; i &lt; M; i++ {
+
+		if begin &gt; end {
+			break
+		}
+		// 向上取整，要吃就要吃一整个
+		mid = int(math.Ceil(float64(end+begin) / 2))
+		if sum(mid) == M {
+			fmt.Println(mid)
+			return
+		}
+		if sum(mid) &lt; M {
+			// 取等于是因为防止没有正好吃完的情况，需要取mid的值
+			begin = mid
+		} else {
+			end = mid - 1
+		}
+	}
+	// 这是有剩余巧克力的情况
+	fmt.Println(mid)
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Insert sort]]></title>
         <id>https://twFR.github.io/post/insert-sort</id>
