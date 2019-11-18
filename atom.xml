@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2019-11-17T17:59:49.251Z</updated>
+    <updated>2019-11-18T17:04:37.005Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,6 +10,58 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 🌟谭先生✨</rights>
+    <entry>
+        <title type="html"><![CDATA[fibobacci]]></title>
+        <id>https://twFR.github.io/post/fibobacci</id>
+        <link href="https://twFR.github.io/post/fibobacci">
+        </link>
+        <updated>2019-11-18T15:49:09.000Z</updated>
+        <content type="html"><![CDATA[<p>今天简单做一个题，这个点了，太累了，打卡滴</p>
+<h2 id="需求">需求</h2>
+<p>给一个数N，看能通过多少步N+1或者N-1使它成为fibobacci数<br>
+0&lt; N &lt;1000000<br>
+fibobacci都清楚 0 1 1 2 3 5 8 13 ... 不赘述</p>
+<h2 id="示例">示例</h2>
+<p>输入：</p>
+<blockquote>
+<p>5<br>
+15</p>
+</blockquote>
+<p>输出：</p>
+<blockquote>
+<p>0<br>
+2</p>
+</blockquote>
+<h2 id="解题思路">解题思路</h2>
+<p>这个就很简单，不用说了<br>
+看我极简代码风格，哈哈哈😂</p>
+<h2 id="极简代码">极简代码</h2>
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+func main() {
+	var number int
+	for {
+		if num, err := fmt.Scanf(&quot;%d&quot;, &amp;number); num != 1 || err != nil {
+			return
+		}
+		begin, next := 0, 1
+		for begin+next &lt; number {
+			begin, next = next, begin+next
+		}
+		if number-next &lt; begin+next-number {
+			fmt.Println(number - next)
+		} else {
+			fmt.Println(begin + next - number)
+		}
+	}
+}
+
+</code></pre>
+<p>当然不推荐，容易被打死</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[binary search]]></title>
         <id>https://twFR.github.io/post/binary-search</id>
