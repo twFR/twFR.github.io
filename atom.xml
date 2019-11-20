@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2019-11-18T17:04:37.005Z</updated>
+    <updated>2019-11-20T16:47:10.291Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,6 +10,402 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 🌟谭先生✨</rights>
+    <entry>
+        <title type="html"><![CDATA[k8s Installation and deployment]]></title>
+        <id>https://twFR.github.io/post/k8s-installation-and-deployment</id>
+        <link href="https://twFR.github.io/post/k8s-installation-and-deployment">
+        </link>
+        <updated>2019-11-19T16:30:24.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="准备">准备</h2>
+<ul>
+<li>Macos/windows系统电脑</li>
+<li>vmware虚拟机</li>
+<li><a href="http://old-releases.ubuntu.com/releases/18.10/ubuntu-18.10-live-server-amd64.iso">Ubuntu18.10</a></li>
+<li><a href="http://m6.pc6.com/xuh6/scrt854.zip">secureCRT</a>（用来管理虚拟机的，比直接用vmware好用多了）</li>
+<li><a href="https://download.docker.com/linux/ubuntu/dists/bionic/pool/stable/amd64/docker-ce_18.06.1~ce~3-0~ubuntu_amd64.deb">docker-ce 18.06</a></li>
+</ul>
+<p>由于我有你们懂得的东西，可以去国外下载对应的镜像组件等，还是比较方便，如果是没有的话，可能还得配置网络源等东西会比较麻烦</p>
+<h2 id="安装ubuntu">安装ubuntu</h2>
+<p>我是用的mac装的vnware，在虚拟机里面装的ubuntu，还是蛮简单的，注意的是需要至少给虚拟机cpu分配两核，k8s至少要两核才能安装</p>
+<h4 id="安装需要的软件">安装需要的软件</h4>
+<p>安装一些基础工具</p>
+<blockquote>
+<p>sudo apt-get update &amp;&amp; apt-get install -y curl telnet wget man \</p>
+</blockquote>
+<blockquote>
+<p>apt-transport-https ca-certificates software-properties-common vim</p>
+</blockquote>
+<h2 id="安装docker">安装docker</h2>
+<ul>
+<li>
+<p>下载docker18.06的离线安装包  [18.06]</p>
+</li>
+<li>
+<p>scp到自己的虚拟机上面去</p>
+<p>先查看自己虚拟机的ip地址：ifconfig<br>
+然后 scp docker-ce_18.06.1_ce_3-0_ubuntu_amd64.deb tan@172.16.234.132:/home/tan/package</p>
+</li>
+</ul>
+<p>搞定</p>
+<ul>
+<li>
+<p>离线安装虚拟机</p>
+<blockquote>
+<p>sudo dpkg -i  docker-ce_18.06.1_ce_3-0_ubuntu_amd64.deb</p>
+</blockquote>
+<p>我安装遇到了错误 提示我依赖缺失 然后我就安装依赖</p>
+<blockquote>
+<p>sudo apt-get install -y libltd17</p>
+</blockquote>
+<p>然后又提示我找不到包，应该就是源文件的问题，更新下源文件</p>
+<blockquote>
+<p>#仅检查，不更新</p>
+<p>sudo apt update</p>
+<p>#更新已安装的软件包</p>
+<p>sudo apt upsade</p>
+</blockquote>
+<p>解决之后重新安装docker，搞定</p>
+</li>
+<li>
+<p>允许开机启动docker</p>
+<blockquote>
+<p>sudo systemctl enable docker</p>
+<p>sudo systemctl start docker</p>
+</blockquote>
+</li>
+<li>
+<p>启动一个精简的操作系统容器测试</p>
+<blockquote>
+<p>sudo docker run -ti alpine:latest sh</p>
+</blockquote>
+</li>
+<li>
+<p>将当前的普通用户添加到当前的docker用户组里面去</p>
+<blockquote>
+<p>sudo groupadd docker</p>
+<p>sudo usermod -aG docker $USER</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="kubernetes安装">kubernetes安装</h2>
+<ul>
+<li>
+<p>免费的阿里云镜像加速器</p>
+<p>https://ozcouvlb.mirror.aliyuncs.com</p>
+</li>
+<li>
+<p>配置国内镜像加速器</p>
+<blockquote>
+<p>vim /etc/docker/daemon.json</p>
+<p>#文件里的内容如下：</p>
+<p># {</p>
+<p>#	&quot;registry-mirrors&quot;:  [https://ozcouvlb.mirror.aliyuncs.com]</p>
+<p>#}</p>
+</blockquote>
+</li>
+<li>
+<p>重启docker服务</p>
+<blockquote>
+<p>sudo systemctl daemon-reload</p>
+<p>sudo systemctl restart docker</p>
+</blockquote>
+</li>
+<li>
+<p>配置并安装k8s源</p>
+</li>
+<li>
+<p>创建配置文件</p>
+<blockquote>
+<p>sudo vim /etc/apt/sources.list.d/kubernetes.list</p>
+<p>#添加以下内容</p>
+<p>#deb https://mirrors.ustc.edu.cn/kubernetes/apt kubernets-xenial main</p>
+<p>sudo chmod 640 /etc/apt/sources.list.d/kubernetes.list</p>
+</blockquote>
+</li>
+<li>
+<p>执行如下命令更新操作系统源</p>
+</li>
+</ul>
+<pre><code>&gt; sudo apt update
+</code></pre>
+<ul>
+<li>
+<p>有可能遇到的问题 NO_PUBKEY,解决方法如下：</p>
+<blockquote>
+<p>#添加认证 一定要用自己的账户执行，不能用root</p>
+</blockquote>
+<blockquote>
+<p>sudo gpg --keyserver keyserver.ubuntu.com --recv-keys BA07F4FB(回显NO_PUBKEY的后8位)</p>
+<p>sudo gpg --export --armor BA07F4FB</p>
+<p>#将回显的key保存到一个文件里面</p>
+<p>vim pubkey</p>
+<p>#将ley添加到本地的truested数据库中</p>
+<p>sudo apt-key add pubkey</p>
+</blockquote>
+</li>
+<li>
+<p>解决后再次更新，完美搞定</p>
+</li>
+<li>
+<p>禁止基础设施</p>
+<ul>
+<li>关闭防火墙（容器之间通讯不需要这些限制,话说我之前用win一直也都是关闭的）</li>
+</ul>
+<blockquote>
+<p>sudo ufw disable</p>
+</blockquote>
+<ul>
+<li>
+<p>关闭swap(k8s不希望使用swap)</p>
+<blockquote>
+<p>sudo swapoff -a</p>
+<p>永久关闭</p>
+<p>sudo sed -i 's/.*swap.*/#$/' /etc/fstab</p>
+</blockquote>
+</li>
+<li>
+<p>禁止selinux（ubuntu默认安装的安全组件）</p>
+<blockquote>
+<p>#安装操控selinux的组件</p>
+<p>sudo apt install -y selinux-utils</p>
+<p>#禁止selinux</p>
+<p>setenforce 0</p>
+<p>#重启</p>
+<p>shutdown -r now</p>
+<p>#查看是否关闭</p>
+<p>sudo getenforce</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>
+<p>k8s系统网络配置</p>
+<ol>
+<li>配置内核参数，将桥接的IPv4流量传递到iptables的链</li>
+</ol>
+<p>创建配置文件</p>
+<blockquote>
+<p>sudo vim /etc/sysctl.d/k8s.conf</p>
+</blockquote>
+<p>添加如下内容：</p>
+<blockquote>
+<p>net.bridge.bridge-nf-call-ip6tables = 1</p>
+<p>net.bridge.bridge-nf-call-iptables = 1</p>
+<p>vm.swappiness = 0</p>
+</blockquote>
+<ol start="2">
+<li>
+<p>使配置文件生效</p>
+<blockquote>
+<p>sudo modprobe br_netfilter</p>
+</blockquote>
+<blockquote>
+<p>sudo sysctl -p /etc/sysctl.d/k8s.conf</p>
+</blockquote>
+</li>
+</ol>
+</li>
+<li>
+<p>安装k8s</p>
+<blockquote>
+<p>sudo apt update &amp;&amp; apt-get install -y kubelet=1.13.1-00 kubernetes-cni=0.6.0-00 kubeadm=1.13.1-00 kubectl=1.13.1-00</p>
+</blockquote>
+<ul>
+<li>kubelet 永久的后端服务</li>
+<li>kubectl 客户端进程，用户和开发者使用kubectl可以运维维护k8s</li>
+<li>kubeadm 也是客户端进程，权限很高，相当于管理员，用的很少</li>
+</ul>
+</li>
+<li>
+<p>设置开机自启动</p>
+<blockquote>
+<p>sudo systemctl enable kubelet &amp;&amp; systemctl start kubelet</p>
+<p>sudo shutdown -r now</p>
+</blockquote>
+</li>
+<li>
+<p>验证k8s</p>
+<blockquote>
+<p>kubectl get nodes</p>
+<p>kubectl version</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="创建多节点">创建多节点</h2>
+<ul>
+<li>
+<p>将已经搭建好的环境的虚拟机复制两份出来，搭建一个三节点的集群</p>
+<p>将已经搭建好开发环境的虚拟机关机，然后创建完整克隆</p>
+</li>
+<li>
+<p>之后再用ifconfig命令查看新节点的ip，用secureCRT登录节点</p>
+</li>
+<li>
+<p>给node配置hostname</p>
+<blockquote>
+<p>su</p>
+<p>vim /etc/hostname</p>
+<p>#分别改为master/node1/node2</p>
+</blockquote>
+</li>
+<li>
+<p>配置ip地址</p>
+<blockquote>
+<p>vim /etc/netplan/50-cloud-init.yaml</p>
+</blockquote>
+</li>
+</ul>
+<p>network:</p>
+<p>​	 ethernets:</p>
+<p>​			ens33:</p>
+<p>​					addresses: [172.16.234.134/24]</p>
+<p>​					dhcp4: false</p>
+<p>​					gateway4: 172.16.234.2</p>
+<p>​					nameservers:</p>
+<p>​									addresses: [172.16.234.2]</p>
+<p>​					optional: true</p>
+<p>​			version: 2</p>
+<p>按照自己节点的ip配置，也可以自己定为连续的ip，方便操作，dhcp改成false防止每次重启ip变掉</p>
+<p>​	&gt; netplan apply</p>
+<p>使配置生效</p>
+<ul>
+<li>
+<p>修改hosts文件</p>
+<blockquote>
+<p>vim /etc/hosts</p>
+<p>#输入以下内容</p>
+<p>#172.16.234.132 master</p>
+<p>#172.16.234.133 node1</p>
+<p>#172.16.234.134 node2</p>
+</blockquote>
+</li>
+</ul>
+<p>三个节点均需要配置,通过ping来检验是否配置成功</p>
+<h2 id="部署k8s集群">部署k8s集群</h2>
+<ul>
+<li>
+<p>---------<font color=red><strong>master节点上配置</strong></font> --------</p>
+</li>
+<li>
+<p>创建k8s的管理工具kubeadm对应的配置文件，候选操作在/home/itcast/working/ 目录下</p>
+</li>
+<li>
+<p>使用kubeadm配置文件，通过在配置文件中指定docker镜像地址部署</p>
+<p>生成配置文件</p>
+<blockquote>
+<p>kubeadm config print init-defaults ClusterConfiguration &gt; kubeadm.conf</p>
+</blockquote>
+</li>
+<li>
+<p>修改配置文件里面的下面项</p>
+<blockquote>
+<p>vim kubeadm.conf</p>
+<p>#修改k8s版本号为v1.13.1</p>
+<p>kubernetesVersion: v1.13.1</p>
+<p>#修改hostname为master</p>
+<p>name: master</p>
+<p>#修改kubeadm.conf中的API服务器地址</p>
+<p>localAPIEndpoint:</p>
+<p>​    advertiseAddress: 172.16.234.132    # master的IP</p>
+<p>​    bindPort：6443</p>
+<p>#配置子网网络</p>
+<p>networking:</p>
+<p>​    dnsDomian: cluster.local</p>
+<p>​    podSubnet: &quot;10.244.0.0/16&quot;         #  k8s内部pod网络,官方推荐</p>
+<p>​    servicesSubnet: 10.96.0.0/12    # k8s服务网络,官方推荐</p>
+<p>scheduler: {}</p>
+</blockquote>
+</li>
+<li>
+<p>拉取k8s必备的模块镜像</p>
+<blockquote>
+<p>#查看需要哪些镜像文件需要拉取</p>
+<p>kubeadm config images list --config kubeadm.conf</p>
+<p>#k8s.gcr.io/kube-apiserver:v1.13.1.                   对外端口，提供入口让外部访问集群<br>
+#k8s.gcr.io/kube-controller-manager:v1.13.1     内部管理器<br>
+#k8s.gcr.io/kube-scheduler:v1.13.1                   内部任务调度器<br>
+#k8s.gcr.io/kube-proxy:v1.13.1                         负载均衡<br>
+#k8s.gcr.io/pause:3.1                                     业务容器共享Pause容器的网络栈和Volume挂载卷，因此他们之间通信和数据交换更为高效<br>
+#k8s.gcr.io/etcd:3.2.24                                  数据一致性<br>
+#k8s.gcr.io/coredns:1.2.6</p>
+<p>#拉取全部当前版本k8s关联的镜像</p>
+<p>kubeadm config images pull --config ./kubeadm.conf</p>
+<p>#如果无法下载，只能去docker.io仓库手动拉镜像然后改tag（或者registry.cn-hangzhou.aliyuncs.com/google_containers）</p>
+<p>docker pull mirrorgooglecontainers/kube-apiserver:v1.13.1</p>
+<p>docker tag mirrorgooglecontainers/kube-apiserver:v1.13.1 k8s.gcr.io/kube-apiserver:v1.13.1 #打tag，和需要的镜像名保持一致</p>
+<p>docker rmi mirrorgooglecontainers/kube-apiserver:v1.13.1    #删除掉多余的镜像</p>
+<p>#其他所有镜像类似,k8s.gcr.io/coredns:1.2.6特例</p>
+<p>docker pull coredns/coredns:1.1.3</p>
+<p>root@tan:/home/tan/package# docker images<br>
+REPOSITORY                           TAG                 IMAGE ID            CREATED             SIZE<br>
+k8s.gcr.io/kube-proxy                v1.13.1             fdb321fd30a0        11 months ago       80.2MB<br>
+k8s.gcr.io/kube-apiserver            v1.13.1             40a63db91ef8        11 months ago       181MB<br>
+k8s.gcr.io/kube-controller-manager   v1.13.1             26e6f1db2a52        11 months ago       146MB<br>
+k8s.gcr.io/kube-scheduler            v1.13.1             ab81d7360408        11 months ago       79.6MB<br>
+k8s.gcr.io/etcd                      3.2.24              3cab8e1b9802        14 months ago       220MB<br>
+k8s.gcr.io/coredns                   1.2.6               b3b94275d97c        18 months ago       45.6MB<br>
+k8s.gcr.io/pause                     3.1                 da86e6ba6ca1        23 months ago       742kB</p>
+</blockquote>
+</li>
+<li>
+<p>初始化k8s环境</p>
+<blockquote>
+<p>sudo kubeadm init --config ./kubeadm.conf</p>
+</blockquote>
+</li>
+</ul>
+<p>回显如下：</p>
+<pre><code>	 &gt; Your Kubernetes master has initialized successfully!
+	 &gt;
+	 &gt; To start using your cluster, you need to run the following as a regular user:
+	 &gt;
+	 &gt; ​    mkdir -p $HOME/.kube
+	 &gt;
+	 &gt; ​	sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+	 &gt;
+	 &gt; ​	sudo chown $(id -u):$(id -g) $HOME/.kube/config
+	 &gt;
+	 &gt; You should now deploy a pod network to the cluster.
+	 &gt; Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:
+	 &gt;   https://kubernetes.io/docs/concepts/cluster-administration/addons/
+	 &gt;
+	 &gt; You can now join any number of machines by running the following on each node
+	 &gt; as root:
+	 &gt;
+	 &gt;   kubeadm join 172.16.234.132:6443 --token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:ebc50ff8588c35917f9c6f84f2bd8048352b82bfb9ef06cf5b63934cb9862f49
+</code></pre>
+<p>根据提示，做如下操作</p>
+<blockquote>
+<p>#master节点基本文件夹配置</p>
+</blockquote>
+<blockquote>
+<p>mkdir -p $HOME/.kube</p>
+<p>sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</p>
+<p>sudo chown <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mi>i</mi><mi>d</mi><mo>−</mo><mi>u</mi><mo>)</mo><mo>:</mo></mrow><annotation encoding="application/x-tex">(id -u):</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">u</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">:</span></span></span></span>(id -g) $HOME/.kube/config</p>
+</blockquote>
+<p>同时，如果node节点想要加入master集群，需要执行以下命令</p>
+<blockquote>
+<p>kubeadm join 172.16.234.132:6443 --token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:ebc50ff8588c35917f9c6f84f2bd8048352b82bfb9ef06cf5b63934cb9862f49</p>
+</blockquote>
+<ul>
+<li>
+<p>启动k8s</p>
+<blockquote>
+<p>sudo systemctl enable kubelet</p>
+<p>sudo systemctl start kubelet</p>
+</blockquote>
+</li>
+<li>
+<p>验证k8s启动结果</p>
+<blockquote>
+<p>kubectl get node</p>
+</blockquote>
+</li>
+</ul>
+<p>如果有问题，可以参考这个 <a href="https://stackoverflow.com/questions/52720380/kubernetes-api-server-is-not-starting-on-a-single-kubeadm-cluster">拉取最新版本</a>然后重新来一遍，我就是这个花了一下午（微笑脸）</p>
+<p>未完待续。。。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[fibobacci]]></title>
         <id>https://twFR.github.io/post/fibobacci</id>
