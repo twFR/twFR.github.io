@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2020-12-20T02:19:37.849Z</updated>
+    <updated>2020-12-20T02:31:22.580Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -12,8 +12,8 @@
     <rights>All rights reserved 2020, 🌟谭先生✨</rights>
     <entry>
         <title type="html"><![CDATA[k8s Installation and deployment]]></title>
-        <id>https://twFR.github.io/post/k8s-installation-and-deployment</id>
-        <link href="https://twFR.github.io/post/k8s-installation-and-deployment">
+        <id>https://twFR.github.io/post/k8s-installation-and-deployment/</id>
+        <link href="https://twFR.github.io/post/k8s-installation-and-deployment/">
         </link>
         <updated>2019-11-19T16:30:24.000Z</updated>
         <content type="html"><![CDATA[<h2 id="准备">准备</h2>
@@ -408,8 +408,8 @@ k8s.gcr.io/pause                     3.1                 da86e6ba6ca1        23 
     </entry>
     <entry>
         <title type="html"><![CDATA[fibobacci]]></title>
-        <id>https://twFR.github.io/post/fibobacci</id>
-        <link href="https://twFR.github.io/post/fibobacci">
+        <id>https://twFR.github.io/post/fibobacci/</id>
+        <link href="https://twFR.github.io/post/fibobacci/">
         </link>
         <updated>2019-11-18T15:49:09.000Z</updated>
         <content type="html"><![CDATA[<p>今天简单做一个题，这个点了，太累了，打卡滴</p>
@@ -460,8 +460,8 @@ func main() {
     </entry>
     <entry>
         <title type="html"><![CDATA[binary search]]></title>
-        <id>https://twFR.github.io/post/binary-search</id>
-        <link href="https://twFR.github.io/post/binary-search">
+        <id>https://twFR.github.io/post/binary-search/</id>
+        <link href="https://twFR.github.io/post/binary-search/">
         </link>
         <updated>2019-11-17T12:43:15.000Z</updated>
         <content type="html"><![CDATA[<h2 id="需求">需求</h2>
@@ -555,8 +555,8 @@ func search() {
     </entry>
     <entry>
         <title type="html"><![CDATA[Insert sort]]></title>
-        <id>https://twFR.github.io/post/insert-sort</id>
-        <link href="https://twFR.github.io/post/insert-sort">
+        <id>https://twFR.github.io/post/insert-sort/</id>
+        <link href="https://twFR.github.io/post/insert-sort/">
         </link>
         <updated>2019-11-15T15:36:02.000Z</updated>
         <content type="html"><![CDATA[<h2 id="需求">需求</h2>
@@ -660,8 +660,8 @@ func insertSort(disorderNumber []int) []int {
     </entry>
     <entry>
         <title type="html"><![CDATA[Multiplication by large numbers]]></title>
-        <id>https://twFR.github.io/post/multiplication-by-large-numbers</id>
-        <link href="https://twFR.github.io/post/multiplication-by-large-numbers">
+        <id>https://twFR.github.io/post/multiplication-by-large-numbers/</id>
+        <link href="https://twFR.github.io/post/multiplication-by-large-numbers/">
         </link>
         <updated>2019-11-14T14:02:22.000Z</updated>
         <content type="html"><![CDATA[<h2 id="需求">需求</h2>
@@ -751,8 +751,8 @@ func multiplication(largeNumber [1000]int, number int) [1000]int {
     </entry>
     <entry>
         <title type="html"><![CDATA[Bubble Sort]]></title>
-        <id>https://twFR.github.io/post/bubble-sort</id>
-        <link href="https://twFR.github.io/post/bubble-sort">
+        <id>https://twFR.github.io/post/bubble-sort/</id>
+        <link href="https://twFR.github.io/post/bubble-sort/">
         </link>
         <updated>2019-11-13T12:06:43.000Z</updated>
         <content type="html"><![CDATA[<h2 id="需求">需求</h2>
@@ -847,8 +847,8 @@ func main() {
     </entry>
     <entry>
         <title type="html"><![CDATA[Thread、Process and Coroutine]]></title>
-        <id>https://twFR.github.io/post/threadprocess-and-coroutine</id>
-        <link href="https://twFR.github.io/post/threadprocess-and-coroutine">
+        <id>https://twFR.github.io/post/threadprocess-and-coroutine/</id>
+        <link href="https://twFR.github.io/post/threadprocess-and-coroutine/">
         </link>
         <updated>2019-07-18T02:16:08.000Z</updated>
         <content type="html"><![CDATA[<p>梳理下线程、进程和协程<br>
@@ -892,8 +892,8 @@ func Run()  {
     </entry>
     <entry>
         <title type="html"><![CDATA[TCP reliable transmission]]></title>
-        <id>https://twFR.github.io/post/tcprt</id>
-        <link href="https://twFR.github.io/post/tcprt">
+        <id>https://twFR.github.io/post/tcprt/</id>
+        <link href="https://twFR.github.io/post/tcprt/">
         </link>
         <updated>2019-06-23T07:29:34.000Z</updated>
         <content type="html"><![CDATA[<p>🏫一直以来对TCP连接的可靠性，三次握手，四次挥手有过了解，但要组织语言说出来好像还真不容易，今天就系统的记录一下，以供更加深入的理解。</p>
@@ -926,7 +926,7 @@ func Run()  {
 </ul>
 <p>👍通过这六个策略，保障了tcp连接的可靠性</p>
 <h2 id="看看tcp报文段格式">看看TCP报文段格式</h2>
-<figure data-type="image" tabindex="1"><img src="http://img4.imgtn.bdimg.com/it/u=2627348429,2184604078&amp;fm=214&amp;gp=0.jpg" alt="TCP报文段" title="TCP报文段"></figure>
+<figure data-type="image" tabindex="1"><img src="http://img4.imgtn.bdimg.com/it/u=2627348429,2184604078&amp;fm=214&amp;gp=0.jpg" alt="TCP报文段" title="TCP报文段" loading="lazy"></figure>
 <p>👨🏻‍💻解释下各个字段用途：</p>
 <ul>
 <li>源/目的端口号: 表示数据是从哪个进程来, 到哪个进程去；</li>
@@ -945,13 +945,13 @@ FIN: 通知对方, 本端要关闭了, 我们称携带FIN标识的为结束报�
 PS：ACK、SYN和FIN这些大写的单词表示标志位，其值要么是1，要么是0；ack、seq小写的单词表示序号。</li>
 </ul>
 <h2 id="tcp建立连接三次握手">TCP建立连接（三次握手）</h2>
-<p><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3554453119,3518152184&amp;fm=15&amp;gp=0.jpg" alt="三次握手" title="三次握手"><br>
+<p><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3554453119,3518152184&amp;fm=15&amp;gp=0.jpg" alt="三次握手" title="三次握手" loading="lazy"><br>
 🤝第一次握手：建立连接时，客户端【CLOSED -&gt; SYN_SENT】发送syn包（SYN=1，seq=x）到服务器，并进入SYN_SENT状态，等待服务器【CLOSED-&gt;LISTEN】确认；SYN：同步序列编号（Synchronize Sequence Numbers）。</p>
 <p>🤝第二次握手：服务器收到syn包，必须确认客户的SYN，同时服务器【LISTEN-&gt;SYN_RCVD】也发送一个SYN包（SYN=1，ACK=1，seq=y，ack=x+1），此时服务器进入SYN_RCVD状态；</p>
 <p>🤝第三次握手：客户端收到服务器的同步包，向服务器发送确认包ACK(ack=y+1），此包发送完毕，客户端【SYN_SENT -&gt; ESTABLISHED】和服务器【SYN_RCVD -&gt; ESTABLISHED】进入ESTABLISHED（TCP连接成功）状态，完成三次握手。</p>
 <p><font size="3">ps：发送报文段确认号实际就为收到的报文段序列号加1，以保证按序到达</font><br /></p>
 <h2 id="tcp关闭连接四次挥手">TCP关闭连接（四次挥手）</h2>
-<p><img src="http://img0.ph.126.net/silia0LWWddxSzcvFjPHQQ==/6632311313349802875.png" alt="三次握手" title="三次握手"><br>
+<p><img src="http://img0.ph.126.net/silia0LWWddxSzcvFjPHQQ==/6632311313349802875.png" alt="三次握手" title="三次握手" loading="lazy"><br>
 🙋第一次挥手：客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。</p>
 <p>🙋‍♂️第二次挥手：服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。</p>
 <p>🙋第三次挥手：客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。</p>
@@ -969,8 +969,8 @@ PS：ACK、SYN和FIN这些大写的单词表示标志位，其值要么是1，�
     </entry>
     <entry>
         <title type="html"><![CDATA[Golang Timer]]></title>
-        <id>https://twFR.github.io/post/golang-timer</id>
-        <link href="https://twFR.github.io/post/golang-timer">
+        <id>https://twFR.github.io/post/golang-timer/</id>
+        <link href="https://twFR.github.io/post/golang-timer/">
         </link>
         <updated>2019-06-09T09:53:16.000Z</updated>
         <content type="html"><![CDATA[<p>我们trm里面有个kube-system项目，由于是k8s的内置namespace，所以创建的时间比较早，在当时的情况下没有办法在cfe创建icagent的守护进程，所以以前没有默认开启平台监控这个功能。</p>
