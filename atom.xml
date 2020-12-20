@@ -2,14 +2,14 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2019-11-20T16:47:10.291Z</updated>
+    <updated>2020-12-20T02:19:37.849Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
     <subtitle>敲不出代码的程序猿的🏠</subtitle>
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2019, 🌟谭先生✨</rights>
+    <rights>All rights reserved 2020, 🌟谭先生✨</rights>
     <entry>
         <title type="html"><![CDATA[k8s Installation and deployment]]></title>
         <id>https://twFR.github.io/post/k8s-installation-and-deployment</id>
@@ -995,22 +995,5 @@ PS：ACK、SYN和FIN这些大写的单词表示标志位，其值要么是1，�
 </code></pre>
 <p>一个很简单的定时器，用isSucceed作为标志位，如果是失败的就一直循环创建，一旦成功，就退出了这个goroutine。</p>
 ]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Original Inteneion]]></title>
-        <id>https://twFR.github.io/post/original-inteneion</id>
-        <link href="https://twFR.github.io/post/original-inteneion">
-        </link>
-        <updated>2019-05-26T15:38:39.000Z</updated>
-        <content type="html"><![CDATA[<p>作为一个重度拖延症患者<br>
-是时候开始给自己的生活一点目标了！<br>
-最近想换工作 不停的在学习 才发现自己真的low到爆<br>
-讲道理 先立一个flag🇺🇳<br>
-今年一定要脱坑</p>
-<p><s>同时 今年能不能脱单呢  哈哈</s></p>
-<p>花了一下午搭了这个blog<br>
-希望能不忘自己的初衷<br>
-学习 奋斗 加油！</p>
-<img src ="http://wx3.sinaimg.cn/large/0068Lfdely1frpye1fsgsj30g20g20t9.jpg" width = "100" height = "100" div align=left>]]></content>
     </entry>
 </feed>
