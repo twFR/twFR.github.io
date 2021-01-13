@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>golang summary | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610520130636">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610558716842">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610520130636" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610558716842" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -267,6 +267,102 @@ func main() {
     }
 }
 </code></pre>
+</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li>Go语言中，通过在结构体内置匿名的成员来实现继承：</li>
+</ul>
+<pre><code>type Cache struct {
+    m map[string]string
+     sync.Mutex
+     }
+     
+ func (p *Cache) Lookup(key string) string {
+     p.Lock()
+     defer p.Unlock()
+     
+     return p.m[key]
+     }
+</code></pre>
+<p>Cache结构体类型通过嵌入一个匿名的sync.Mutex来继承它的Lock和Unlock方法. 但是在调用           p.Lock()和p.Unlock()时, p并不是Lock和Unlock方法的真正接收者, 而是会将它们展开为           p.Mutex.Lock()和p.Mutex.Unlock()调用. 这种展开是编译期完成的, 并没有运行时代价.</p>
+<h2 id="接口">接口</h2>
+<ul>
+<li>有时候对象和接口之间太灵活了，导致我们需要人为地限制这种无意之间的适配
+<ul>
+<li>常见的做法是定义一个含特殊方法来区分接口。</li>
+<li>再严格一点的做法是给接口定义一个私有方法。只有满足了这个私有方法的对象才可能满足这个接口，而私有方法的名字是包含包的绝对路径名的，因此只能在包内部实现这个私有方法才能满足这个接口。</li>
+</ul>
+<pre><code>type testing.TB interface {
+Error(args ...interface{})
+Errorf(format string, args ...interface{})
+...
+
+// A private method to prevent users implementing the
+// interface and so future additions to it will not
+// violate Go 1 compatibility.
+private()
+}
+</code></pre>
+</li>
+</ul>
+<p>不过这种通过私有方法禁止外部对象实现接口的做法也是有代价的：首先是这个接口只能包内部使用，外部包正常情况下是无法直接创建满足该接口对象的；其次，这种防护措施也不是绝对的，恶意的用户依然可以绕过这种保护机制,如下</p>
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;testing&quot;
+)
+
+type TB struct {
+    testing.TB  //隐式转换了TB接口为testing.TB
+}
+
+func (p *TB) Fatal(args ...interface{}) {
+    fmt.Println(&quot;TB.Fatal disabled!&quot;)
+}
+
+func main() {
+    var tb testing.TB = new(TB)
+    tb.Fatal(&quot;Hello, playground&quot;)
+}
+</code></pre>
+<p>这种通过嵌入匿名接口或嵌入匿名指针对象来实现继承的做法其实是一种纯虚继承，我们继承的只是接口指定的规范，真正的实现在运行的时候才被注入。</p>
+<h2 id="并发">并发</h2>
+<ul>
+<li>
+<p>在Go语言中，同一个Goroutine线程内部，顺序一致性内存模型是得到保证的。但是不同的Goroutine之间，并不满足顺序一致性内存模型，需要通过明确定义的同步事件来作为同步的参考。如果两个事件不可排序，那么就说这两个事件是并发的。为了最大化并行，Go语言的编译器和处理器在不影响上述规定的前提下可能会对执行语句重新排序（CPU也会对一些指令进行乱序执行）。</p>
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+)
+
+var d string
+var b bool
+
+
+func setup() {
+  d = &quot;hello world&quot;
+  fmt.Println(d)
+  b = true
+}
+
+func main() {
+  done := make(chan int)
+
+  go func() {
+  	setup()
+  	done &lt;- 1   //传入信号说明setup执行完毕
+  }()
+  &lt;- done        //接收到信号说明b的值已经刷新完毕，主进程能正确监听到b的值
+  if !b {}
+  print(d)
+}
+</code></pre>
+<blockquote>
+<p>channel就是为了让程序满足顺序一致性内存模型</p>
+</blockquote>
 <p>。。。。持续更新</p>
 </li>
 </ul>
