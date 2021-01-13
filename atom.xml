@@ -2,14 +2,50 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2020-12-20T02:55:09.797Z</updated>
+    <updated>2021-01-13T06:34:21.316Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
     <subtitle>敲不出代码的程序猿的🏠</subtitle>
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2020, 🌟谭先生✨</rights>
+    <rights>All rights reserved 2021, 🌟谭先生✨</rights>
+    <entry>
+        <title type="html"><![CDATA[golang unsafe package]]></title>
+        <id>https://twFR.github.io/post/golang-unsafe-package/</id>
+        <link href="https://twFR.github.io/post/golang-unsafe-package/">
+        </link>
+        <updated>2020-05-08T06:27:11.000Z</updated>
+        <content type="html"><![CDATA[<p>使用unsafe.Pointer来取切片的属性</p>
+<pre><code>func testPointer() {
+	s := make([]int, 9, 20)
+	s = append(s, 2)
+	len := *(*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&amp;s)) + uintptr(8)))
+	cap := *(*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&amp;s)) + uintptr(16)))
+
+	dataPointer := *(*int)(unsafe.Pointer(&amp;s))
+	data1 := *(*int)(unsafe.Pointer(uintptr(dataPointer)))
+
+	fmt.Printf(&quot;len: %d cap:%d \n&quot;, len, cap)
+	fmt.Printf(&quot;dataPointer: %d  data1:%d \n&quot;, dataPointer, data1)
+
+	i := 0
+	for {
+		if i &gt;= len {
+			break
+		}
+		fmt.Printf(&quot;data%d:%d \n&quot;, i, *(*int)(unsafe.Pointer(uintptr(dataPointer) + uintptr(8*i))))
+		i++
+	}
+}
+</code></pre>
+<p>unsafe 包绕过了 Go 的类型系统，达到直接操作内存的目的，使用它有一定的风险性。但是在某些场景下，使用 unsafe 包提供的函数会提升代码的效率，Go 源码中也是大量使用 unsafe 包。</p>
+<p>unsafe 包定义了 Pointer 和三个函数：</p>
+<p>通过三个函数可以获取变量的大小(Sizeof)、偏移(Offsetof)、对齐(Alignof)等信息。</p>
+<p>uintptr 可以和 unsafe.Pointer 进行相互转换，uintptr 可以进行数学运算。这样，通过 uintptr 和 unsafe.Pointer 的结合就解决了 Go 指针不能进行数学运算的限制。</p>
+<p>通过 unsafe 相关函数，可以获取结构体私有成员的地址，进而对其做进一步的读写操作，突破 Go 的类型安全限制。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[k8s Installation and deployment]]></title>
         <id>https://twFR.github.io/post/k8s-installation-and-deployment/</id>

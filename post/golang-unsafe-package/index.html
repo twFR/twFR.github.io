@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>fibobacci | 🌟谭先生✨</title>
+<title>golang unsafe package | 🌟谭先生✨</title>
 <link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610519650378">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
@@ -78,64 +78,48 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              fibobacci
+              golang unsafe package
             </h2>
             <div class="post-info">
               <time class="post-time">
-                · 2019-11-18 ·
+                · 2020-05-08 ·
               </time>
               
-                <a href="https://twFR.github.io/tag/kmZn9BU_t/" class="post-tag">
-                  # practice
+                <a href="https://twFR.github.io/tag/Z7--HtZrc/" class="post-tag">
+                  # golang
                 </a>
               
             </div>
             
             <div class="post-content">
-              <p>今天简单做一个题，这个点了，太累了，打卡滴</p>
-<h2 id="需求">需求</h2>
-<p>给一个数N，看能通过多少步N+1或者N-1使它成为fibobacci数<br>
-0&lt; N &lt;1000000<br>
-fibobacci都清楚 0 1 1 2 3 5 8 13 ... 不赘述</p>
-<h2 id="示例">示例</h2>
-<p>输入：</p>
-<blockquote>
-<p>5<br>
-15</p>
-</blockquote>
-<p>输出：</p>
-<blockquote>
-<p>0<br>
-2</p>
-</blockquote>
-<h2 id="解题思路">解题思路</h2>
-<p>这个就很简单，不用说了<br>
-看我极简代码风格，哈哈哈😂</p>
-<h2 id="极简代码">极简代码</h2>
-<pre><code>package main
+              <p>使用unsafe.Pointer来取切片的属性</p>
+<pre><code>func testPointer() {
+	s := make([]int, 9, 20)
+	s = append(s, 2)
+	len := *(*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&amp;s)) + uintptr(8)))
+	cap := *(*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&amp;s)) + uintptr(16)))
 
-import &quot;fmt&quot;
+	dataPointer := *(*int)(unsafe.Pointer(&amp;s))
+	data1 := *(*int)(unsafe.Pointer(uintptr(dataPointer)))
 
-func main() {
-	var number int
+	fmt.Printf(&quot;len: %d cap:%d \n&quot;, len, cap)
+	fmt.Printf(&quot;dataPointer: %d  data1:%d \n&quot;, dataPointer, data1)
+
+	i := 0
 	for {
-		if num, err := fmt.Scanf(&quot;%d&quot;, &amp;number); num != 1 || err != nil {
-			return
+		if i &gt;= len {
+			break
 		}
-		begin, next := 0, 1
-		for begin+next &lt; number {
-			begin, next = next, begin+next
-		}
-		if number-next &lt; begin+next-number {
-			fmt.Println(number - next)
-		} else {
-			fmt.Println(begin + next - number)
-		}
+		fmt.Printf(&quot;data%d:%d \n&quot;, i, *(*int)(unsafe.Pointer(uintptr(dataPointer) + uintptr(8*i))))
+		i++
 	}
 }
-
 </code></pre>
-<p>当然不推荐，容易被打死</p>
+<p>unsafe 包绕过了 Go 的类型系统，达到直接操作内存的目的，使用它有一定的风险性。但是在某些场景下，使用 unsafe 包提供的函数会提升代码的效率，Go 源码中也是大量使用 unsafe 包。</p>
+<p>unsafe 包定义了 Pointer 和三个函数：</p>
+<p>通过三个函数可以获取变量的大小(Sizeof)、偏移(Offsetof)、对齐(Alignof)等信息。</p>
+<p>uintptr 可以和 unsafe.Pointer 进行相互转换，uintptr 可以进行数学运算。这样，通过 uintptr 和 unsafe.Pointer 的结合就解决了 Go 指针不能进行数学运算的限制。</p>
+<p>通过 unsafe 相关函数，可以获取结构体私有成员的地址，进而对其做进一步的读写操作，突破 Go 的类型安全限制。</p>
 
             </div>
           </article>
@@ -144,9 +128,9 @@ func main() {
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://twFR.github.io/post/binary-search/">
+            <a href="https://twFR.github.io/post/k8s-installation-and-deployment/">
               <h3 class="post-title">
-                binary search
+                k8s Installation and deployment
               </h3>
             </a>
           </div>
