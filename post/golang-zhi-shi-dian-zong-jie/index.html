@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>golang summary | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610558716842">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610593309771">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610558716842" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610593309771" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -360,12 +360,58 @@ func main() {
   print(d)
 }
 </code></pre>
-<blockquote>
-<p>channel就是为了让程序满足顺序一致性内存模型</p>
-</blockquote>
-<p>。。。。持续更新</p>
+<pre><code>var d string
+var b bool
+
+
+func setup() {
+    d = &quot;hello world&quot;
+    fmt.Println(d)
+    b = true
+}
+
+ func main() {
+     var wg sync.WaitGroup
+     wg.Add(1)       //1表示1次done之后关闭wait
+     go func() {
+         setup()
+         wg.Done()
+ }()
+
+ 
+wg.Wait()     //能否接受到数据
+   if !b {}
+   print(d)
+}
+p;[[[[[[[```
+&gt; channel就是为了让程序满足顺序一致性内存模型
+
+</code></pre>
+<p>var limit = make(chan int, 3)<br>
+var work =[]func()time.Time {time.Now}</p>
+<p>func main() {<br>
+for _, w := range work {<br>
+go func(w func()time.Time) {<br>
+limit &lt;- 1<br>
+w()<br>
+}(w)                       // 传入w以防只取for循环最后一个w<br>
+}</p>
+<p>for{                                // 死循环判断limit是否有信号<br>
+select {<br>
+case &lt;-limit:              // 接收到信号进入case<br>
+fmt.Println(&quot;done&quot;)<br>
+return<br>
+default:<br>
+fmt.Println(&quot;not done&quot;)<br>
+}<br>
+}<br>
+}</p>
+<pre><code>
+
+</code></pre>
 </li>
 </ul>
+<p><font size=100><strong>持续更新.....</strong></font></p>
 
             </div>
           </article>
