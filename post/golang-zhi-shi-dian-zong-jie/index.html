@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>golang summary | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610593309771">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610617994407">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610593309771" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610617994407" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -383,35 +383,282 @@ wg.Wait()     //能否接受到数据
    if !b {}
    print(d)
 }
-p;[[[[[[[```
-&gt; channel就是为了让程序满足顺序一致性内存模型
-
 </code></pre>
-<p>var limit = make(chan int, 3)<br>
-var work =[]func()time.Time {time.Now}</p>
-<p>func main() {<br>
-for _, w := range work {<br>
-go func(w func()time.Time) {<br>
-limit &lt;- 1<br>
-w()<br>
-}(w)                       // 传入w以防只取for循环最后一个w<br>
-}</p>
-<p>for{                                // 死循环判断limit是否有信号<br>
-select {<br>
-case &lt;-limit:              // 接收到信号进入case<br>
-fmt.Println(&quot;done&quot;)<br>
-return<br>
-default:<br>
-fmt.Println(&quot;not done&quot;)<br>
-}<br>
-}<br>
-}</p>
-<pre><code>
+<blockquote>
+<p>channel就是为了让程序满足顺序一致性内存模型</p>
+</blockquote>
+<pre><code>var limit = make(chan int, 3)
+var work =[]func()time.Time {time.Now}
 
+func main() {
+    for _, w := range work {
+        go func(w func()time.Time) {
+            limit &lt;- 1
+            w()
+            }(w)                       // 传入w以防只取for循环最后一个w
+ }
+
+ for{                                // 死循环判断limit是否有信号
+ 	select {
+ 	case &lt;-limit:              // 接收到信号进入case
+ 		fmt.Println(&quot;done&quot;)
+ 		return
+ 	default:
+ 		fmt.Println(&quot;not done&quot;)
+ 	}
+ }
+}
 </code></pre>
 </li>
 </ul>
-<p><font size=100><strong>持续更新.....</strong></font></p>
+<h2 id="并发模型">并发模型</h2>
+<ul>
+<li>生产者消费者模型</li>
+</ul>
+<pre><code>  package main 
+  
+  import (
+	&quot;fmt&quot;
+	&quot;time&quot;
+    )
+  func main() {
+	
+    var ch = make(chan int,100)
+	go producer(1,ch)                   // 生成1的倍数序列
+	go producer(2,ch)                  // 生成2的倍数序列
+	go consumer(ch)                   //消费生成的队列
+
+	time.Sleep(time.Millisecond)
+  }
+  func producer(factor int, out chan&lt;- int) {
+	for i := 0; ; i++ {
+		out &lt;- i * factor
+	}
+  }
+
+  func consumer(in &lt;-chan int) {
+	for v := range in {
+		fmt.Println(v)
+	}
+    }
+</code></pre>
+<ul>
+<li>发布订阅模型<br>
+发布者</li>
+</ul>
+<pre><code>// Package pubsub implements a simple multi-topic pub-sub library.
+package pubsub
+
+import (
+&quot;sync&quot;
+&quot;time&quot;
+)
+
+type (
+    subscriber chan interface{}         // 订阅者为一个管道
+    topicFunc  func(v interface{}) bool // 主题为一个过滤器
+)
+
+// 发布者对象
+type Publisher struct {
+	m           sync.RWMutex             // 读写锁
+	buffer      int                      // 订阅队列的缓存大小
+	timeout     time.Duration            // 发布超时时间
+  subscribers map[subscriber]topicFunc // 订阅者信息
+}
+
+// 构建一个发布者对象, 可以设置发布超时时间和缓存队列的长度
+func NewPublisher(publishTimeout time.Duration, buffer int) *Publisher {
+  return &amp;Publisher{
+  	buffer:      buffer,
+  	timeout:     publishTimeout,
+  	subscribers: make(map[subscriber]topicFunc),
+  }
+}
+
+// 添加一个新的订阅者，订阅全部主题
+func (p *Publisher) Subscribe() chan interface{} {
+  return p.SubscribeTopic(nil)
+}
+
+// 添加一个新的订阅者，订阅过滤器筛选后的主题
+func (p *Publisher) SubscribeTopic(topic topicFunc) chan interface{} {
+  ch := make(chan interface{}, p.buffer)
+  p.m.Lock()
+  p.subscribers[ch] = topic
+  p.m.Unlock()
+  return ch
+}
+
+// 退出订阅
+func (p *Publisher) Evict(sub chan interface{}) {
+  p.m.Lock()
+  defer p.m.Unlock()
+
+  delete(p.subscribers, sub)
+  close(sub)
+}
+
+// 发布一个主题
+func (p *Publisher) Publish(v interface{}) {
+  p.m.RLock()
+  defer p.m.RUnlock()
+
+  var wg sync.WaitGroup
+  for sub, topic := range p.subscribers {
+  	wg.Add(1)
+  	go p.sendTopic(sub, topic, v, &amp;wg)  // wg不是引用类型，一定要传指针
+  }
+  wg.Wait()
+}
+
+// 关闭发布者对象，同时关闭所有的订阅者管道。
+func (p *Publisher) Close() {
+	p.m.Lock()
+	defer p.m.Unlock()
+
+	for sub := range p.subscribers {
+  	delete(p.subscribers, sub)
+  	close(sub)
+  }
+}
+
+// 发送主题，可以容忍一定的超时
+func (p *Publisher) sendTopic(
+	sub subscriber, topic topicFunc, v interface{}, wg *sync.WaitGroup,
+) {
+  defer wg.Done()
+  if topic != nil &amp;&amp; !topic(v) {    //如果topic是空，会将所有v 传到sub里面去，如果不为空并且topicfunc将v传入后的返回值为true时才会把v传到sub
+  	return
+  }
+
+  select {
+  case sub &lt;- v:
+  case &lt;-time.After(p.timeout):
+  }
+}
+</code></pre>
+<p>订阅者：</p>
+<pre><code>package main
+
+import (
+	&quot;demo/demo2/pub&quot;
+	&quot;fmt&quot;
+	&quot;strings&quot;
+	&quot;time&quot;
+)
+
+
+func main() {
+	pub := pubsub.NewPublisher(100*time.Millisecond,3)
+	defer pub.Close()
+
+
+	all := pub.Subscribe()
+
+	golang := pub.SubscribeTopic(func(v interface{}) bool{
+		if s,ok := v.(string);ok {
+			return strings.Contains(s,&quot;golang&quot;)
+		}
+		return false
+	})
+
+	pub.Publish(&quot;hello world&quot;)
+	pub.Publish(&quot;hello tanxin&quot;)
+	pub.Publish(&quot;hello golang&quot;)
+	a:= &lt;-all
+	b:= &lt;- golang
+	fmt.Println(a)
+	fmt.Println(b)
+
+	go func() {
+		for msg := range all{
+			fmt.Println(&quot;all:&quot;,msg)
+		}
+	}()
+
+	go func() {
+		for msg := range golang{
+			fmt.Println(&quot;golang:&quot;,msg)
+		}
+	}()
+
+	time.Sleep(1* time.Second)
+}
+
+</code></pre>
+<h2 id="并发的安全退出">并发的安全退出</h2>
+<ul>
+<li>使用select安全退出</li>
+</ul>
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;sync&quot;
+	&quot;time&quot;
+)
+
+func worker(wg *sync.WaitGroup, cannel chan bool) {
+	defer wg.Done()
+
+	for {
+		select {
+		default:
+			fmt.Println(&quot;hello&quot;)
+		case &lt;-cannel:
+			return
+		}
+	}
+}
+
+func main() {
+	cancel := make(chan bool)
+
+	var wg sync.WaitGroup
+	for i := 0; i &lt; 10; i++ {
+		wg.Add(1)
+		go worker(&amp;wg, cancel)
+	}
+
+	time.Sleep(time.Second)
+	close(cancel)
+	wg.Wait()
+}
+</code></pre>
+<ul>
+<li>使用context包来安全退出<br>
+在Go1.7发布时，标准库增加了一个context包，用来简化对于处理单个请求的多个Goroutine之间与请求域的数据、超时和退出等操作</li>
+</ul>
+<pre><code>func worker(ctx context.Context, wg *sync.WaitGroup) error {
+    defer wg.Done()
+
+    for {
+        select {
+        default:
+            fmt.Println(&quot;hello&quot;)
+        case &lt;-ctx.Done():
+            return ctx.Err()
+        }
+    }
+}
+
+func main() {
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+    var wg sync.WaitGroup
+    for i := 0; i &lt; 10; i++ {
+        wg.Add(1)
+        go worker(ctx, &amp;wg)
+    }
+
+    time.Sleep(time.Second)
+    cancel()                               
+
+    wg.Wait()
+}
+</code></pre>
+<p><font size=100><strong>持续学习.....</strong></font></p>
 
             </div>
           </article>

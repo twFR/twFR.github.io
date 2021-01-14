@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-14T03:01:54.931Z</updated>
+    <updated>2021-01-14T09:53:23.908Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,6 +10,103 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 🌟谭先生✨</rights>
+    <entry>
+        <title type="html"><![CDATA[prime fliter ]]></title>
+        <id>https://twFR.github.io/post/prime-fliter/</id>
+        <link href="https://twFR.github.io/post/prime-fliter/">
+        </link>
+        <updated>2020-06-02T07:01:03.000Z</updated>
+        <content type="html"><![CDATA[<p>使用并发来做一个素数筛</p>
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+func main() {
+	ch :=GenerateNatural()
+	for i:=0;i&lt;100;i++{
+		prime := &lt;-ch                              // 第一个一定是素数
+		fmt.Printf(&quot;%v: %v\n&quot;, i+1, prime)
+		ch = primeFliter(ch,prime)
+	}
+}
+
+// 生成一个自然数列
+func GenerateNatural() chan int {
+	ch := make(chan int)
+	go func() {
+		for i := 2; ; i++ {
+			ch &lt;- i
+		}
+	}()
+	return ch
+}
+
+// 根据prime过滤，过滤后的第一个一定是素数
+func primeFliter(in &lt;- chan int,prime int) chan int{
+	out := make(chan int)
+	go func() {
+		for {
+			if i:=&lt;-in;i%prime!=0{
+				out &lt;- i
+			}
+		}
+	}()
+	return out
+}
+</code></pre>
+<p>GenerateNatural和PrimeFilter函数内部都启动了新的Goroutine，当main函数不再使用管道时后台Goroutine有泄漏的风险。我们可以通过context包来避免这个问题，下面是改进的素数筛实现：</p>
+<pre><code>package main
+
+import (
+	&quot;context&quot;
+	&quot;fmt&quot;
+)
+
+func GenerateNatural(ctx context.Context) chan int {
+	ch := make(chan int)
+	go func() {
+		for i := 2; ; i++ {
+			select {
+			case &lt;-ctx.Done():
+				return
+			case ch &lt;- i:
+			}
+		}
+	}()
+	return ch
+}
+
+func primeFilter(ctx context.Context, in &lt;-chan int, prime int) chan int {
+	out := make(chan int)
+	go func() {
+		for {
+			if i := &lt;-in; i%prime != 0 {
+				select {
+				case &lt;-ctx.Done():
+					return
+				case out &lt;- i:
+				}
+			}
+		}
+	}()
+	return out
+}
+
+func main() {
+
+	ctx, cancel := context.WithCancel(context.Background())
+	ch := GenerateNatural(ctx)
+	for i := 0; i &lt; 1000; i++ {
+		prime := &lt;-ch
+		fmt.Printf(&quot;%v: %v\n&quot;, i+1, prime)
+		ch = primeFilter(ctx, ch, prime)
+	}
+
+	cancel()   // main函数完成时，调用cancel(),通知后台goroutine退出，即ctx.Done收到信号
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[golang unsafe package]]></title>
         <id>https://twFR.github.io/post/golang-unsafe-package/</id>
@@ -1001,35 +1098,6 @@ PS：ACK、SYN和FIN这些大写的单词表示标志位，其值要么是1，�
 <p>TIME_WAIT状态需要经过2MSL才能返回到CLOSE状态是因为网络可能不可靠，客户端发送的确认应答报文服务端没有收到，这个时间是来接受又可能从服务端重发过来的确认报文，如果收到了客户端就重发一次客户端的确认报文，如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接。MSL指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。</p>
 </li>
 </ul>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Golang Timer]]></title>
-        <id>https://twFR.github.io/post/golang-timer/</id>
-        <link href="https://twFR.github.io/post/golang-timer/">
-        </link>
-        <updated>2019-06-09T09:53:16.000Z</updated>
-        <content type="html"><![CDATA[<p>我们trm里面有个kube-system项目，由于是k8s的内置namespace，所以创建的时间比较早，在当时的情况下没有办法在cfe创建icagent的守护进程，所以以前没有默认开启平台监控这个功能。</p>
-<p>然后有同事反应必须要开启，不然就不能做到日志转储，导致磁盘空间占满，于是我想到了一个办法，之所以没办法开启，是因为当时的条件创不出来，但是等到环境安装到一定进度后，有条件了就可以创建出来了。可以设计一个定时器，在创建这个项目的时候就开始创这个icagent ，每隔20秒创建一次，直到创建成功。<br>
-定时器设计如下：</p>
-<pre><code>func CreateProject() {
-	PresetProject() //创建kube-system
-	go func() {
-		isSucceed := false //设置标志位
-		logger.info(&quot;start try to create icagent daemonset&quot;)
-		for !isSucceed {
-			err := createIcagent()
-			if err == nil {
-				isSucceed = true
-				logger.info(&quot;create icagent daemonset succeed&quot;)
-			}
-			time.Sleep(20 * time.Second)
-		}
-	}()
-	return
-}
-</code></pre>
-<p>一个很简单的定时器，用isSucceed作为标志位，如果是失败的就一直循环创建，一旦成功，就退出了这个goroutine。</p>
 ]]></content>
     </entry>
 </feed>
