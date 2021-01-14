@@ -3,8 +3,8 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>prime fliter  | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610617994407">
+<title>prime filter  | 🌟谭先生✨</title>
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610631542440">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610617994407" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610631542440" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -78,7 +78,7 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              prime fliter 
+              prime filter 
             </h2>
             <div class="post-info">
               <time class="post-time">
@@ -130,7 +130,7 @@ func primeFliter(in &lt;- chan int,prime int) chan int{
 	return out
 }
 </code></pre>
-<p>GenerateNatural和PrimeFilter函数内部都启动了新的Goroutine，当main函数不再使用管道时后台Goroutine有泄漏的风险。我们可以通过context包来避免这个问题，下面是改进的素数筛实现：</p>
+<p>GenerateNatural和PrimeFilter函数内部都启动了新的Goroutine，当main函数不再使用管道时后台Goroutine有泄漏的风险。可以通过context包来避免这个问题，下面是改进的素数筛实现：</p>
 <pre><code>package main
 
 import (
