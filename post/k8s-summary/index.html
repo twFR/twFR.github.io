@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title> k8s summary | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610634280076">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610643249270">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610634280076" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610643249270" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -132,6 +132,55 @@
 <li>
 <p>插件（Addons）</p>
 <p>插件使用 Kubernetes 资源（<a href="https://kubernetes.io/zh/docs/concepts/workloads/controllers/daemonset/">DaemonSet</a>、 <a href="https://kubernetes.io/zh/docs/concepts/workloads/controllers/deployment/">Deployment</a>等）实现集群功能。如DNS，Dashboard</p>
+</li>
+</ul>
+<h2 id="架构">架构</h2>
+<h3 id="节点">节点</h3>
+<ul>
+<li>
+<p>可用节点上都包括kubelet，Container Runtime及kube-proxy</p>
+</li>
+<li>
+<p>向API服务器添加节点的方式主要有两种：</p>
+<ol>
+<li>
+<p>节点上的kubelet向控制面执行自注册</p>
+<p>当 kubelet 标志 <code>--register-node</code> 为 true（默认）时，它会尝试向 API 服务注册自己</p>
+</li>
+<li>
+<p>手动注册<br>
+执行操作后，控制面会检查新的node对象是否合法。 如果节点是健康的（即所有必要的服务都在运行中），则该节点可以用来运行 Pod。 否则，直到该节点变为健康之前，所有的集群活动都会忽略该节点。</p>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="控制面节点通信">控制面节点通信</h3>
+<ul>
+<li>
+<p>节点到控制面<br>
+Kubernetes 采用的是中心辐射型（Hub-and-Spoke）API 模式。 所有从集群（或所运行的 Pods）发出的 API 调用都终止于 apiserver（其它控制面组件都没有被设计为可暴露远程服务）。 apiserver 被配置为在一个安全的 HTTPS 端口（443）上监听远程连接请求。应该使用集群的公共根证书开通节点，这样它们就能够基于有效的客户端凭据安全地连接 apiserver。<br>
+当 Pod 被实例化时，Kubernetes 自动把公共根证书和一个有效的持有者令牌注入到 Pod 里。kubernetes 服务（位于所有名字空间中）配置了一个虚拟 IP 地址，用于（通过 kube-proxy）转发 请求到 apiserver 的 HTTPS 末端。<br>
+控制面组件也通过安全端口与集群的 apiserver 通信。<br>
+集群节点和节点上运行的 Pod 到控制面的连接的缺省操作模式即是安全的， 能够在不可信的网络或公网上运行。</p>
+</li>
+<li>
+<p>控制面到节点</p>
+<ol>
+<li>
+<p>API服务器到kubelet</p>
+<p>从apiserver到kubelet的连接用于：</p>
+<ul>
+<li>获取pod日志</li>
+<li>挂接（通过kubectl）到运行中的pod</li>
+<li>通过kubelet的端口转发功能<br>
+这些连接终止于 kubelet 的 HTTPS 末端。 默认情况下，apiserver 不检查 kubelet 的服务证书。这使得此类连接容易受到中间人攻击， 在非受信网络或公开网络上运行也是 不安全的。</li>
+</ul>
+</li>
+<li>
+<p>apiserver到节点，pod和服务</p>
+<p>从 apiserver 到节点、Pod 或服务的连接默认为纯 HTTP 方式，因此既没有认证，也没有加密，这些连接 <strong>目前还不能安全地</strong> 在非受信网络或公共网络上运行。</p>
+</li>
+</ol>
 </li>
 </ul>
 
