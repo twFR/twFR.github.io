@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>golang summary | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610685474803">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610698102402">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610685474803" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610698102402" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -92,7 +92,11 @@
             </div>
             
             <div class="post-content">
-              <h2 id="数组">数组</h2>
+              <h2 id="map">map</h2>
+<p>map是一个key，value形式的hash表，从而将key，value进行一一映射<br>
+golang中的map并不是并发安全的<br>
+golang中sync.Map是并发安全的</p>
+<h2 id="数组">数组</h2>
 <ul>
 <li>数组变量即表示整个数组，是一个完整的值。当i个数组变量<font color=red ><strong>被赋值</strong></font> 或者<font color=red ><strong>被传递</strong></font>的时候，实际上会复制整个数组。为了避免复制数组带来的开销，可以传递一个指向数组的指针，但是数组指针并不是数组</li>
 <li>数组的定义方式：<pre><code>var a [3]int                    // 定义长度为3的int型数组, 元素全部为0
