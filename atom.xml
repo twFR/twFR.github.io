@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-15T04:35:15.920Z</updated>
+    <updated>2021-01-15T04:37:57.301Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -22,10 +22,8 @@ operator可以：</p>
 <ul>
 <li>重复安装和升级</li>
 <li>持续对每个系统组件执行运行状况检查</li>
-<li>汇总现场工程师了解的情况并将其传输给所有用户，而非一两个用户</li>
-</ul>
-<p>operator与servie broker相比：</p>
-<ul>
+<li>汇总现场工程师了解的情况并将其传输给所有用户，而非一两个用户<br>
+operator与servie broker相比：</li>
 <li>Service Broker 朝着实现应用程序的编程式发现和部署的目标前进了一步。但它并非一个长时间运行的进程，所以无法执行第 2 天操作，如升级、故障转移或扩展。它在安装时提供对可调参数的自定义和参数化，而 Operator 则可持续监控集群的当前状态。非集群服务仍非常适合于 Service Broker，但也存在合适于这些服务的 Operator</li>
 </ul>
 <h2 id="operator-framework">operator framework</h2>
