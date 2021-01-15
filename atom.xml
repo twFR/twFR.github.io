@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-14T16:54:11.241Z</updated>
+    <updated>2021-01-15T04:35:15.920Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,6 +10,140 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 🌟谭先生✨</rights>
+    <entry>
+        <title type="html"><![CDATA[operator summary]]></title>
+        <id>https://twFR.github.io/post/operator-summary/</id>
+        <link href="https://twFR.github.io/post/operator-summary/">
+        </link>
+        <updated>2020-10-21T01:45:45.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="概念">概念</h2>
+<p>Operator 是一组软件，可用于降低运行其他软件的操作复杂程度，从技术上讲，Operator 是一种打包、部署和管理 Kubernetes 应用程序的方法。<br>
+operator可以：</p>
+<ul>
+<li>重复安装和升级</li>
+<li>持续对每个系统组件执行运行状况检查</li>
+<li>汇总现场工程师了解的情况并将其传输给所有用户，而非一两个用户</li>
+</ul>
+<p>operator与servie broker相比：</p>
+<ul>
+<li>Service Broker 朝着实现应用程序的编程式发现和部署的目标前进了一步。但它并非一个长时间运行的进程，所以无法执行第 2 天操作，如升级、故障转移或扩展。它在安装时提供对可调参数的自定义和参数化，而 Operator 则可持续监控集群的当前状态。非集群服务仍非常适合于 Service Broker，但也存在合适于这些服务的 Operator</li>
+</ul>
+<h2 id="operator-framework">operator framework</h2>
+<ul>
+<li><strong>operator SDK</strong>   辅助开发者根据自身专业知识，引导，构建，测试和包装其operator</li>
+<li><strong>Operator Lifecycle</strong> Manager 控制集群中operator的安装，升级和基于角色的访问控制（RBAC）</li>
+<li><strong>Operator Registry</strong> 存储CSV和CRD以便在集群中创建，并存储有关软件包和频道的operator元数据</li>
+<li>OperatorHub</li>
+<li>Operator Metering</li>
+</ul>
+<h3 id="常用术语">常用术语</h3>
+<ul>
+<li><strong>bundle</strong> 在bndle fromat中，bundle是CSV，manifests以及metadata的集合</li>
+<li><strong>CatalogSource</strong> 定义应用程序的CSV CRD和软件包仓库</li>
+<li><strong>channel</strong>  channel为 Operator 定义更新流，用于为订阅者推出更新。channel head指向该channel的最新版本。例如，stable channel中会包含 Operator 的所有稳定版本，按由旧到新的顺序排列</li>
+<li><strong>CSV</strong> CSV是利用operator的manifest创建的YAML清单，可辅助olm在集群中运行operator。附带的manifest还可用于在用户界面填充徽标 描述和版本信息。此外，CSV 还是运行 Operator 所需的技术信息来源，类似于其需要的 RBAC 规则及其管理或依赖的自定义资源 (CR)。</li>
+<li><strong>InstallPlan</strong> ip是一个列出了为自动安装或升级 CSV 而需创建的资源的计算列表</li>
+<li><strong>OperatorGroup</strong> og将部署在同一命名空间中的所有 Operator 配置为og对象，以便在一系列命名空间或集群范围内监视其 CR。</li>
+<li><strong>Subscription</strong> sub通过跟踪软件包中的频道来保持 CSV 最新。</li>
+</ul>
+<h3 id="operator-lifecycle-manager">Operator Lifecycle Manager</h3>
+<p>olm可帮助用户安装 更新和管理所有operator的生命周期</p>
+<ol>
+<li>olm资源
+<ul>
+<li>由olm oerator和catalog oerator管理的CRD
+<ul>
+<li><strong>CSV</strong> OLM 需要与 Operator 相关的元数据，以确保它可以在集群中安全运行，并在发布新版 Operator 时提供有关如何应用更新的信息。此外，CSV 还是运行 Operator 所需的技术信息来源，例如其管理或依赖的自定义资源 (CR)、RBAC 规则、集群要求和安装策略。此信息告诉 OLM 如何创建所需资源并将 Operator 设置为 Deployment。</li>
+<li><strong>catalogsource</strong> CatalogSource 代表 OLM 可查询的元数据存储，以发现和安装 Operator 及其依赖项。<br>
+catsrc有三种sourceTypes：<br>
+- 带有<code>image</code>引用的<code>grpc</code>：OLM拉取镜像并运行pod<br>
+- 带有<code>address</code>引用的<code>grpc</code>:OLM会尝试给定地址的gRPC API<br>
+- <code>internal</code>或<code>configmap</code>: OLM 解析 ConfigMap 数据，并运行一个可以为其提供 gRPC API 的 pod</li>
+<li><strong>Subscription</strong> 将 Operator 与 CatalogSource 关联的自定义资源,Subscription 描述了要订阅 Operator 软件包的哪个频道，以及是自动还是手动执行更新。如果设置为自动，Subscription 会确保由 OLM 管理并升级 Operator，以确保集群中始终运行最新版本。</li>
+<li><strong>InstallPlan</strong> ip定义了要创建的一组资源，用于安装或升级到 CSV 定义的 ClusterService 的特定版本。</li>
+<li><strong>OperatorGroup</strong> 为 OLM 安装的 Operator 提供多租户配置。OperatorGroup 选择目标命名空间，在其中为其成员 Operator 生成所需的 RBAC 访问权限。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>olm架构<br>
+由olm operator和catalog operator管理的CRD：csv，ip，catsrc，sub，og<br>
+由olm operator创建的资源：sa，clusterRoles，clusterRoleBindings<br>
+由catalog operator创建的资源 CRD CSV
+<ul>
+<li><strong>Catalog Operator</strong><br>
+Catalog Operator 负责解析和安装 CSV 及其指定的所需资源。另外还负责监视频道中的 CatalogSource 中是否有软件包更新，并将其升级（可选择自动）至最新可用版本。<br>
+用户可创建 Subscription 资源，该资源将配置所需软件包、频道和 CatalogSource，以便从中拉取更新。找到更新后，便会代表用户将适当 InstallPlan 写入命名空间。<br>
+catalog operator工作流：
+<ol>
+<li>连接到集群中的每个 CatalogSource</li>
+<li>监视是否有用户创建的未解析 InstallPlan，如果有：
+<ul>
+<li>查找与请求名称相匹配的 CSV，并将此 CSC 添加为已解析的资源。</li>
+<li>对于每个受管或所需 CRD，将其添加为已解析的资源。</li>
+<li>对于每个所需 CRD，找到管理相应 CRD 的 CSV。</li>
+</ul>
+</li>
+<li>监视是否有已解析的 InstallPlan 并为其创建已发现的所有资源（用户批准或自动）。</li>
+<li>监视 CatalogSource 和 Subscription，并根据它们创建 InstallPlan。</li>
+</ol>
+</li>
+<li><strong>OLM operator</strong><br>
+集群中存在 CSV 中指定需要的资源后，OLM Operator 将负责部署由 CSV 资源定义的应用程序。OLM Operator 不负责创建所需资源， Catalog Operator 来创建这些资源<br>
+OLM operator工作流：
+<ol>
+<li>监视命名空间中的 ClusterServiceVersion (CSV)，并检查是否满足要求</li>
+<li>满足要求，运行CSV安装策略</li>
+</ol>
+<pre><code>&gt; CSV必须为og的活跃成员才可运行该安装策略
+</code></pre>
+</li>
+<li>Catalog Registry<br>
+Catalog Registry 存储 CSV 和 CRD 以便在集群中创建，并存储有关软件包和频道的元数据。</li>
+</ul>
+</li>
+<li>OG
+<ul>
+<li>og成员资格，满足以下任一条件：
+<ol>
+<li>Operator 的 CSV 与 OperatorGroup 存在于同一命名空间中。</li>
+<li>Operator 的 CSV InstallMode 支持 OperatorGroup 所针对的命名空间集。<br>
+InstallMode和受支持的og
+<ul>
+<li>OwnNamespace：Operator 可以是选择其自有命名空间的 OperatorGroup 的成员。</li>
+<li>SingleNamespace：Operator 可以是选择某一个命名空间的 OperatorGroup 的成员。</li>
+<li>MultiNamespace：Operator 可以是选择多个命名空间的 OperatorGroup 的成员。</li>
+<li>AllNamespaces：Operator 可以是选择所有命名空间的 OperatorGroup 的成员（目标命名空间集为空字符串 &quot;&quot;）<br>
+全局 OperatorGroup 的 status.namespace 包含空字符串 (&quot;&quot;)，而该字符串会向正在使用的 Operator 发出信号，要求其监视所有命名空间。<br>
+OLM 会在每个 OperatorGroup 的目标命名空间中复制 OperatorGroup 的所有活跃成员 CSV。复制 CSV 的目的在于告诉目标命名空间的用户，特定 Operator 已配置为监视在此创建的资源。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>基于角色的访问控制<br>
+创建 OperatorGroup 时，会生成三个 ClusterRole。每个 ClusterRole 均包含一个 AggregationRule，后者设置了 ClusterRoleSelector 以匹配标签，
+<ul>
+<li>&lt;operatorgroup_name&gt;-admin  （olm.opgroup.permissions/aggregate-to-admin: &lt;operatorgroup_name&gt;）</li>
+<li>&lt;operatorgroup_name&gt;-edit    （olm.opgroup.permissions/aggregate-to-edit: &lt;operatorgroup_name&gt;）</li>
+<li>&lt;operatorgroup_name&gt;-view   （olm.opgroup.permissions/aggregate-to-view: &lt;operatorgroup_name&gt;）<br>
+CSV 成为 OperatorGroup 的活跃成员时，只要该 CSV 正在使用 AllNamespaces InstallMode 来监视所有命名空间，且没有因 InterOperatorGroupOwnerConflict 原因处于故障状态，便会生成以下 RBAC 资源。</li>
+<li>来自 CRD 的每个 API 资源的 ClusterRole （&lt;kind&gt;.&lt;group&gt;-&lt;version&gt;-admin &lt;kind&gt;.&lt;group&gt;-&lt;version&gt;-edit &lt;kind&gt;.&lt;group&gt;-&lt;version&gt;-view &lt;kind&gt;.&lt;group&gt;-&lt;version&gt;-view-crdview）</li>
+<li>来自APIService，针对每个 API 资源生成的 ClusterRole （&lt;kind&gt;.&lt;group&gt;-&lt;version&gt;-admin &lt;kind&gt;.&lt;group&gt;-&lt;version&gt;-edit &lt;kind&gt;.&lt;group&gt;-&lt;version&gt;-view）</li>
+<li>额外的role和rolebinding</li>
+</ul>
+</li>
+<li>og交集<br>
+如果两个 OperatorGroup 的目标命名空间集的交集不是空集，且根据 olm.providedAPIs 注解的定义，所提供的 API 集的交集也不是空集，则称这两个 OperatorGroup 的提供的 API 有交集。</li>
+<li>og故障<br>
+1. 如果一个命名空间中存在多个 OperatorGroup，则在该命名空间中创建的所有 CSV 均会变成故障状态，故障原因为：TooManyOperatorGroups。一旦命名空间中 OperatorGroup 的数量变成 1，因该原因处于故障状态的 CSV 将转变为等待处理状态。<br>
+2. 如果 CSV 的 InstallMode 不支持其命名空间中 OperatorGroup 的目标命名空间选择，CSV 将变为故障状态，故障原因为 UnsupportedOperatorGroup。一旦 OperatorGroup 的目标命名空间选择变为受支持的配置，或 CSV 的 InstallMode 经修改后支持 OperatorGroup 的目标命名空间选择，因该原因处于故障状态的 CSV 将转变为等待处理状态。</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[prime filter ]]></title>
         <id>https://twFR.github.io/post/prime-fliter/</id>
@@ -1075,51 +1209,6 @@ func main() {
 }
 </code></pre>
 <p>搞定！</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Thread、Process and Coroutine]]></title>
-        <id>https://twFR.github.io/post/threadprocess-and-coroutine/</id>
-        <link href="https://twFR.github.io/post/threadprocess-and-coroutine/">
-        </link>
-        <updated>2019-07-18T02:16:08.000Z</updated>
-        <content type="html"><![CDATA[<p>梳理下线程、进程和协程<br>
-一句话总结：每个进程有自己独立的地址空间，分享系统资源；线程访问隶属进程资源，同一进程所有线程共享进程所有资源；协程由程序自身控制，在子程序内部可中断。</p>
-<h2 id="进程">进程</h2>
-<p>一个程序运行就会在内存空间里形成一个独立的内存体，这个内存体有自己独立的地址空间和独立的堆，操作系统会以操作系统会以进程为单位，分配系统资源（CPU时间片、内存等资源），进程是资源分配的最小单位。</p>
-<p>进程所维护的是程序所包含的资源（静态资源）， 如：地址空间，打开的文件句柄集，文件系统状态，信号处理handler等；</p>
-<h2 id="线程">线程</h2>
-<p>线程，有时被称为轻量级进程(Lightweight Process，LWP），是操作系统调度（CPU调度）执行的最小单位。</p>
-<p>线程所维护的运行相关的资源（动态资源），如：运行栈，调度相关的控制信息，待处理的信号集等；</p>
-<p>在创建或撤消进程时，由于系统都要为之分配和回收资源，导致系统的开销明显大于创建或撤消线程时的开销线程有自己的堆栈和局部变量，但线程之间没有单独的地址空间，一个进程死掉就等于所有的线程死掉，所以多进程的程序要比多线程的程序健壮，但在进程切换时，耗费资源较大，效率要差一些。</p>
-<h2 id="协程">协程</h2>
-<p>协程不是被操作系统内核所管理，而完全是由程序所控制（也就是在用户态执行）。这样带来的好处就是性能得到了很大的提升，不会像线程切换那样消耗资源。</p>
-<p>协程在子程序内部是可中断的，然后转而执行别的子程序，在适当的时候再返回来接着执行。</p>
-<p>线程默认的栈是8m，而一个协程只需要几十kb</p>
-<p>极高的执行效率：因为子程序切换不是线程切换，而是由程序自身控制，因此，没有线程切换的开销，和多线程比，线程数量越多，协程的性能优势就越明显；</p>
-<p>不需要多线程的锁机制：因为只有一个线程，也不存在同时写变量冲突，在协程中控制共享资源不加锁，只需要判断状态就好了，所以执行效率比多线程高很多。</p>
-<pre><code>type work struct {
-	x, y, z int
-}
-
-func worker(in &lt;- chan *work, out chan &lt;-  *work) {
-	for w := range in{
-		w.z = w.x * w.y
-		Sleep(w.z)
-		out &lt;- w
-	}
-	}
-
-func Run()  {
-	in , out:= make(chan *work), make(chan *work)
-	for i:= 0; i&lt; NumWorks; i++{
-		go worker(in, out)
-	}
-	go sendLotsOfWork(in)
-	receiveLotsOfResults(out)
-
-}
-</code></pre>
 ]]></content>
     </entry>
 </feed>
