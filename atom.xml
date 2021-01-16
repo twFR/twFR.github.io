@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-15T08:08:25.176Z</updated>
+    <updated>2021-01-16T10:47:17.020Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,6 +10,169 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 🌟谭先生✨</rights>
+    <entry>
+        <title type="html"><![CDATA[Time Format]]></title>
+        <id>https://twFR.github.io/post/time-format/</id>
+        <link href="https://twFR.github.io/post/time-format/">
+        </link>
+        <updated>2021-01-16T06:28:09.000Z</updated>
+        <content type="html"><![CDATA[<p>昨天听高人说golang的time format很有意思，之前没有用到过，专门了解了一下<br>
+当我试着随便如下打印当前时间：</p>
+<pre><code>fmt.Println(time.Now().Format(&quot;2021年1月16日&quot; ))
+</code></pre>
+<p>output:</p>
+<pre><code>16161年1月16日
+</code></pre>
+<p>大惑不解，googel了一下，说是一定要用固定的时间去格式化，Go的蛋辰，果然仪式感还是很重要的，如下</p>
+<pre><code>fmt.Println(time.Now().Format(&quot;2006年1月2日 15:04:05&quot; ))
+fmt.Println(time.Now().Format(&quot;2006年1月2日&quot; ))
+</code></pre>
+<p>output:</p>
+<pre><code>2021年1月16日 18:37:18
+2021年1月16日
+</code></pre>
+<p>稍微看下源码<br>
+在AppendFormat方法里调用nextStdChunk方法，确实是用循环去对固定的时间检索：</p>
+<pre><code>// nextStdChunk finds the first occurrence of a std string in
+// layout and returns the text before, the std string, and the text after.
+func nextStdChunk(layout string) (prefix string, std int, suffix string) {
+	for i := 0; i &lt; len(layout); i++ {
+		switch c := int(layout[i]); c {
+		case 'J': // January, Jan
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i:i+3] == &quot;Jan&quot; {
+				if len(layout) &gt;= i+7 &amp;&amp; layout[i:i+7] == &quot;January&quot; {
+					return layout[0:i], stdLongMonth, layout[i+7:]
+				}
+				if !startsWithLowerCase(layout[i+3:]) {
+					return layout[0:i], stdMonth, layout[i+3:]
+				}
+			}
+
+		case 'M': // Monday, Mon, MST
+			if len(layout) &gt;= i+3 {
+				if layout[i:i+3] == &quot;Mon&quot; {
+					if len(layout) &gt;= i+6 &amp;&amp; layout[i:i+6] == &quot;Monday&quot; {
+						return layout[0:i], stdLongWeekDay, layout[i+6:]
+					}
+					if !startsWithLowerCase(layout[i+3:]) {
+						return layout[0:i], stdWeekDay, layout[i+3:]
+					}
+				}
+				if layout[i:i+3] == &quot;MST&quot; {
+					return layout[0:i], stdTZ, layout[i+3:]
+				}
+			}
+
+		case '0': // 01, 02, 03, 04, 05, 06, 002
+			if len(layout) &gt;= i+2 &amp;&amp; '1' &lt;= layout[i+1] &amp;&amp; layout[i+1] &lt;= '6' {
+				return layout[0:i], std0x[layout[i+1]-'1'], layout[i+2:]
+			}
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i+1] == '0' &amp;&amp; layout[i+2] == '2' {
+				return layout[0:i], stdZeroYearDay, layout[i+3:]
+			}
+
+		case '1': // 15, 1
+			if len(layout) &gt;= i+2 &amp;&amp; layout[i+1] == '5' {
+				return layout[0:i], stdHour, layout[i+2:]
+			}
+			return layout[0:i], stdNumMonth, layout[i+1:]
+
+		case '2': // 2006, 2
+			if len(layout) &gt;= i+4 &amp;&amp; layout[i:i+4] == &quot;2006&quot; {
+				return layout[0:i], stdLongYear, layout[i+4:]
+			}
+			return layout[0:i], stdDay, layout[i+1:]
+
+		case '_': // _2, _2006, __2
+			if len(layout) &gt;= i+2 &amp;&amp; layout[i+1] == '2' {
+				//_2006 is really a literal _, followed by stdLongYear
+				if len(layout) &gt;= i+5 &amp;&amp; layout[i+1:i+5] == &quot;2006&quot; {
+					return layout[0 : i+1], stdLongYear, layout[i+5:]
+				}
+				return layout[0:i], stdUnderDay, layout[i+2:]
+			}
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i+1] == '_' &amp;&amp; layout[i+2] == '2' {
+				return layout[0:i], stdUnderYearDay, layout[i+3:]
+			}
+
+		case '3':
+			return layout[0:i], stdHour12, layout[i+1:]
+
+		case '4':
+			return layout[0:i], stdMinute, layout[i+1:]
+
+		case '5':
+			return layout[0:i], stdSecond, layout[i+1:]
+
+		case 'P': // PM
+			if len(layout) &gt;= i+2 &amp;&amp; layout[i+1] == 'M' {
+				return layout[0:i], stdPM, layout[i+2:]
+			}
+
+		case 'p': // pm
+			if len(layout) &gt;= i+2 &amp;&amp; layout[i+1] == 'm' {
+				return layout[0:i], stdpm, layout[i+2:]
+			}
+
+		case '-': // -070000, -07:00:00, -0700, -07:00, -07
+			if len(layout) &gt;= i+7 &amp;&amp; layout[i:i+7] == &quot;-070000&quot; {
+				return layout[0:i], stdNumSecondsTz, layout[i+7:]
+			}
+			if len(layout) &gt;= i+9 &amp;&amp; layout[i:i+9] == &quot;-07:00:00&quot; {
+				return layout[0:i], stdNumColonSecondsTZ, layout[i+9:]
+			}
+			if len(layout) &gt;= i+5 &amp;&amp; layout[i:i+5] == &quot;-0700&quot; {
+				return layout[0:i], stdNumTZ, layout[i+5:]
+			}
+			if len(layout) &gt;= i+6 &amp;&amp; layout[i:i+6] == &quot;-07:00&quot; {
+				return layout[0:i], stdNumColonTZ, layout[i+6:]
+			}
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i:i+3] == &quot;-07&quot; {
+				return layout[0:i], stdNumShortTZ, layout[i+3:]
+			}
+
+		case 'Z': // Z070000, Z07:00:00, Z0700, Z07:00,
+			if len(layout) &gt;= i+7 &amp;&amp; layout[i:i+7] == &quot;Z070000&quot; {
+				return layout[0:i], stdISO8601SecondsTZ, layout[i+7:]
+			}
+			if len(layout) &gt;= i+9 &amp;&amp; layout[i:i+9] == &quot;Z07:00:00&quot; {
+				return layout[0:i], stdISO8601ColonSecondsTZ, layout[i+9:]
+			}
+			if len(layout) &gt;= i+5 &amp;&amp; layout[i:i+5] == &quot;Z0700&quot; {
+				return layout[0:i], stdISO8601TZ, layout[i+5:]
+			}
+			if len(layout) &gt;= i+6 &amp;&amp; layout[i:i+6] == &quot;Z07:00&quot; {
+				return layout[0:i], stdISO8601ColonTZ, layout[i+6:]
+			}
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i:i+3] == &quot;Z07&quot; {
+				return layout[0:i], stdISO8601ShortTZ, layout[i+3:]
+			}
+
+		case '.': // .000 or .999 - repeated digits for fractional seconds.
+			if i+1 &lt; len(layout) &amp;&amp; (layout[i+1] == '0' || layout[i+1] == '9') {
+				ch := layout[i+1]
+				j := i + 1
+				for j &lt; len(layout) &amp;&amp; layout[j] == ch {
+					j++
+				}
+				// String of digits must end here - only fractional second is all digits.
+				if !isDigit(layout, j) {
+					std := stdFracSecond0
+					if layout[i+1] == '9' {
+						std = stdFracSecond9
+					}
+					std |= (j - (i + 1)) &lt;&lt; stdArgShift
+					return layout[0:i], std, layout[j:]
+				}
+			}
+		}
+	}
+	return layout, 0, &quot;&quot;
+}
+</code></pre>
+<p>记时间方法也挺简单 6(年)1(月)2(日)3(时)4(分)5(秒),严重怀疑只是为了简单。 看来我还是太单纯</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[operator summary]]></title>
         <id>https://twFR.github.io/post/operator-summary/</id>
@@ -1111,102 +1274,6 @@ func multiplication(largeNumber [1000]int, number int) [1000]int {
 	return largeNumber
 }
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Bubble Sort]]></title>
-        <id>https://twFR.github.io/post/bubble-sort/</id>
-        <link href="https://twFR.github.io/post/bubble-sort/">
-        </link>
-        <updated>2019-11-13T12:06:43.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="需求">需求</h2>
-<p>输入带存储单位的数值，排序后输出<br>
-1G=1000M；1T=1000G</p>
-<h2 id="举例">举例</h2>
-<p>（第一行为将要输入的数值个数）<br>
-输入：</p>
-<blockquote>
-<p>3<br>
-1G<br>
-50M<br>
-2T</p>
-</blockquote>
-<p>输出：</p>
-<blockquote>
-<p>50M<br>
-1G<br>
-2T</p>
-</blockquote>
-<h2 id="解题思路">解题思路</h2>
-<ul>
-<li>用一个底层数组为个数为num的切片放传进来的存储数值</li>
-<li>将数值单位转化为对应个数的0，转化后的值作为map的key，转化前的为map的value</li>
-<li>冒泡排序将切片排序</li>
-<li>遍历切片，拿到map的key，打印对应的value，完事收工</li>
-</ul>
-<h2 id="代码实现">代码实现</h2>
-<pre><code>package main
-
-import (
-	&quot;bufio&quot;
-	&quot;fmt&quot;
-	&quot;os&quot;
-	&quot;strconv&quot;
-	&quot;strings&quot;
-)
-
-func main() {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		input1, _, _ := reader.ReadLine()
-
-		inputLen := len(input1)
-		if inputLen == 0 {
-			break
-		}
-
-		num, _ := strconv.Atoi(string(input1))
-		inputArr := make([]string,num)
-		memoryMp := make(map[string]string)
-		for i := 0; i &lt; num; i++ {
-			inputNum, _, _ := reader.ReadLine()
-			inputArr[i] = string(inputNum)
-		}
-
-		for i := 0; i &lt; num; i++ {
-			temp := strings.Replace(inputArr[i], &quot;M&quot;, &quot;&quot;, -1)
-			temp = strings.Replace(temp, &quot;G&quot;, &quot;000&quot;, -1)
-			temp = strings.Replace(temp, &quot;T&quot;, &quot;000000&quot;, -1)
-			memoryMp[temp] = inputArr[i]
-			inputArr[i] = temp
-		}
-		fmt.Println(inputArr)
-		fmt.Println(memoryMp)
-		for i := 0; i &lt; num; i++ {
-			flag := false
-			for j := 1; j &lt; num-i; j++ {
-				pre, _ := strconv.Atoi(inputArr[j-1])
-				next, _ := strconv.Atoi(inputArr[j])
-				if pre &gt; next {
-					temp := inputArr[j-1]
-					inputArr[j-1] = inputArr[j]
-					inputArr[j] = temp
-					flag = true
-				}
-			}
-			if !flag {
-				break
-			}
-		}
-		fmt.Println(&quot;正确的排序为：&quot;)
-		fmt.Println(inputArr)
-		for i := 0; i &lt; num; i++ {
-			fmt.Println(memoryMp[inputArr[i]])
-		}
-	}
-}
-</code></pre>
-<p>搞定！</p>
 ]]></content>
     </entry>
 </feed>

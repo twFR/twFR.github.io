@@ -1,0 +1,304 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Time Format | 🌟谭先生✨</title>
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610794033815">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://twFR.github.io">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610794033815" alt="">
+  </a>
+  <h1 class="site-title">
+    🌟谭先生✨
+  </h1>
+  <p class="site-description">
+    敲不出代码的程序猿的🏠
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="https://www.facebook.com/xin.tan.106902" target="_blank">
+          <i class="fab fa-facebook"></i>
+        </a>
+      
+    
+  </div>
+</div>
+
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Time Format
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2021-01-16 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>昨天听高人说golang的time format很有意思，之前没有用到过，专门了解了一下<br>
+当我试着随便如下打印当前时间：</p>
+<pre><code>fmt.Println(time.Now().Format(&quot;2021年1月16日&quot; ))
+</code></pre>
+<p>output:</p>
+<pre><code>16161年1月16日
+</code></pre>
+<p>大惑不解，googel了一下，说是一定要用固定的时间去格式化，Go的蛋辰，果然仪式感还是很重要的，如下</p>
+<pre><code>fmt.Println(time.Now().Format(&quot;2006年1月2日 15:04:05&quot; ))
+fmt.Println(time.Now().Format(&quot;2006年1月2日&quot; ))
+</code></pre>
+<p>output:</p>
+<pre><code>2021年1月16日 18:37:18
+2021年1月16日
+</code></pre>
+<p>稍微看下源码<br>
+在AppendFormat方法里调用nextStdChunk方法，确实是用循环去对固定的时间检索：</p>
+<pre><code>// nextStdChunk finds the first occurrence of a std string in
+// layout and returns the text before, the std string, and the text after.
+func nextStdChunk(layout string) (prefix string, std int, suffix string) {
+	for i := 0; i &lt; len(layout); i++ {
+		switch c := int(layout[i]); c {
+		case 'J': // January, Jan
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i:i+3] == &quot;Jan&quot; {
+				if len(layout) &gt;= i+7 &amp;&amp; layout[i:i+7] == &quot;January&quot; {
+					return layout[0:i], stdLongMonth, layout[i+7:]
+				}
+				if !startsWithLowerCase(layout[i+3:]) {
+					return layout[0:i], stdMonth, layout[i+3:]
+				}
+			}
+
+		case 'M': // Monday, Mon, MST
+			if len(layout) &gt;= i+3 {
+				if layout[i:i+3] == &quot;Mon&quot; {
+					if len(layout) &gt;= i+6 &amp;&amp; layout[i:i+6] == &quot;Monday&quot; {
+						return layout[0:i], stdLongWeekDay, layout[i+6:]
+					}
+					if !startsWithLowerCase(layout[i+3:]) {
+						return layout[0:i], stdWeekDay, layout[i+3:]
+					}
+				}
+				if layout[i:i+3] == &quot;MST&quot; {
+					return layout[0:i], stdTZ, layout[i+3:]
+				}
+			}
+
+		case '0': // 01, 02, 03, 04, 05, 06, 002
+			if len(layout) &gt;= i+2 &amp;&amp; '1' &lt;= layout[i+1] &amp;&amp; layout[i+1] &lt;= '6' {
+				return layout[0:i], std0x[layout[i+1]-'1'], layout[i+2:]
+			}
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i+1] == '0' &amp;&amp; layout[i+2] == '2' {
+				return layout[0:i], stdZeroYearDay, layout[i+3:]
+			}
+
+		case '1': // 15, 1
+			if len(layout) &gt;= i+2 &amp;&amp; layout[i+1] == '5' {
+				return layout[0:i], stdHour, layout[i+2:]
+			}
+			return layout[0:i], stdNumMonth, layout[i+1:]
+
+		case '2': // 2006, 2
+			if len(layout) &gt;= i+4 &amp;&amp; layout[i:i+4] == &quot;2006&quot; {
+				return layout[0:i], stdLongYear, layout[i+4:]
+			}
+			return layout[0:i], stdDay, layout[i+1:]
+
+		case '_': // _2, _2006, __2
+			if len(layout) &gt;= i+2 &amp;&amp; layout[i+1] == '2' {
+				//_2006 is really a literal _, followed by stdLongYear
+				if len(layout) &gt;= i+5 &amp;&amp; layout[i+1:i+5] == &quot;2006&quot; {
+					return layout[0 : i+1], stdLongYear, layout[i+5:]
+				}
+				return layout[0:i], stdUnderDay, layout[i+2:]
+			}
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i+1] == '_' &amp;&amp; layout[i+2] == '2' {
+				return layout[0:i], stdUnderYearDay, layout[i+3:]
+			}
+
+		case '3':
+			return layout[0:i], stdHour12, layout[i+1:]
+
+		case '4':
+			return layout[0:i], stdMinute, layout[i+1:]
+
+		case '5':
+			return layout[0:i], stdSecond, layout[i+1:]
+
+		case 'P': // PM
+			if len(layout) &gt;= i+2 &amp;&amp; layout[i+1] == 'M' {
+				return layout[0:i], stdPM, layout[i+2:]
+			}
+
+		case 'p': // pm
+			if len(layout) &gt;= i+2 &amp;&amp; layout[i+1] == 'm' {
+				return layout[0:i], stdpm, layout[i+2:]
+			}
+
+		case '-': // -070000, -07:00:00, -0700, -07:00, -07
+			if len(layout) &gt;= i+7 &amp;&amp; layout[i:i+7] == &quot;-070000&quot; {
+				return layout[0:i], stdNumSecondsTz, layout[i+7:]
+			}
+			if len(layout) &gt;= i+9 &amp;&amp; layout[i:i+9] == &quot;-07:00:00&quot; {
+				return layout[0:i], stdNumColonSecondsTZ, layout[i+9:]
+			}
+			if len(layout) &gt;= i+5 &amp;&amp; layout[i:i+5] == &quot;-0700&quot; {
+				return layout[0:i], stdNumTZ, layout[i+5:]
+			}
+			if len(layout) &gt;= i+6 &amp;&amp; layout[i:i+6] == &quot;-07:00&quot; {
+				return layout[0:i], stdNumColonTZ, layout[i+6:]
+			}
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i:i+3] == &quot;-07&quot; {
+				return layout[0:i], stdNumShortTZ, layout[i+3:]
+			}
+
+		case 'Z': // Z070000, Z07:00:00, Z0700, Z07:00,
+			if len(layout) &gt;= i+7 &amp;&amp; layout[i:i+7] == &quot;Z070000&quot; {
+				return layout[0:i], stdISO8601SecondsTZ, layout[i+7:]
+			}
+			if len(layout) &gt;= i+9 &amp;&amp; layout[i:i+9] == &quot;Z07:00:00&quot; {
+				return layout[0:i], stdISO8601ColonSecondsTZ, layout[i+9:]
+			}
+			if len(layout) &gt;= i+5 &amp;&amp; layout[i:i+5] == &quot;Z0700&quot; {
+				return layout[0:i], stdISO8601TZ, layout[i+5:]
+			}
+			if len(layout) &gt;= i+6 &amp;&amp; layout[i:i+6] == &quot;Z07:00&quot; {
+				return layout[0:i], stdISO8601ColonTZ, layout[i+6:]
+			}
+			if len(layout) &gt;= i+3 &amp;&amp; layout[i:i+3] == &quot;Z07&quot; {
+				return layout[0:i], stdISO8601ShortTZ, layout[i+3:]
+			}
+
+		case '.': // .000 or .999 - repeated digits for fractional seconds.
+			if i+1 &lt; len(layout) &amp;&amp; (layout[i+1] == '0' || layout[i+1] == '9') {
+				ch := layout[i+1]
+				j := i + 1
+				for j &lt; len(layout) &amp;&amp; layout[j] == ch {
+					j++
+				}
+				// String of digits must end here - only fractional second is all digits.
+				if !isDigit(layout, j) {
+					std := stdFracSecond0
+					if layout[i+1] == '9' {
+						std = stdFracSecond9
+					}
+					std |= (j - (i + 1)) &lt;&lt; stdArgShift
+					return layout[0:i], std, layout[j:]
+				}
+			}
+		}
+	}
+	return layout, 0, &quot;&quot;
+}
+</code></pre>
+<p>记时间方法也挺简单 6(年)1(月)2(日)3(时)4(分)5(秒),严重怀疑只是为了简单。 看来我还是太单纯</p>
+
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://twFR.github.io/post/operator-summary/">
+              <h3 class="post-title">
+                operator summary
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'db306bd8ac595ee09a0e',
+    clientSecret: '7e169f0897298c132e7c038d4d53e8fece891efb',
+    repo: 'twFR.github.io',
+    owner: 'twFR',
+    admin: ['twFR'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  真有意思 绝无可能
+不要慌 问题不大☘
+ | 
+  <a class="rss" href="https://twFR.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
