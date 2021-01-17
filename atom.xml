@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-17T06:40:11.037Z</updated>
+    <updated>2021-01-17T06:44:23.021Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -449,7 +449,7 @@ func main() {
 </blockquote>
 <h2 id="dockerfile">dockerfile</h2>
 <ul>
-<li>dockerfile必须以<code>FROM</code>指令开始</li>
+<li>dockerfile必须以<code>FROM</code>指令开始。<code>ARG</code>是唯一可以早于<code>FROM</code>执行的指令，查看<a href="ARG%E5%92%8CFROM%E7%9A%84%E4%BA%A4%E4%BA%92">ARG和FROM的交互</a></li>
 <li>dockerfile中以<code>#</code>来标示注释，注释会在dockerfile被执行前移除掉，以免对命令产生影响</li>
 </ul>
 <h3 id="解析器指令">解析器指令</h3>
@@ -460,29 +460,28 @@ func main() {
 </code></pre>
 <p>△ 换行不符合规范</p>
 <pre><code># directive=value1
- # directive=value2
-
- FROM ImageName
+# directive=value2
+FROM ImageName
 </code></pre>
 <p>△ 出现两次</p>
 <pre><code>FROM ImageName
- # directive=value
+# directive=value
 </code></pre>
 <p>△ 在builder指令后面，会被认为是注释</p>
 <pre><code># About my dockerfile
- # directive=value
- FROM ImageName
+# directive=value
+FROM ImageName
 </code></pre>
 <p>△ 在注释后面，会被认为是注释</p>
 <pre><code># unknowndirective=value
- # knowndirective=value
+# knowndirective=value
 </code></pre>
 <p>△ 未知的解释器指令，会被认为是注释，第二行同样会被认为是注释</p>
 <pre><code>#directive=value
- # directive =value
- #	directive= value
- # directive = value
- #	  dIrEcTiVe=value
+# directive =value
+#	directive= value
+# directive = value
+#	  dIrEcTiVe=value
 </code></pre>
 <p>△ 上面几种写法会被认为是同一种写法，即无视空格，不区分大小写</p>
 <p>支持的解释器指令</p>
@@ -503,8 +502,8 @@ escape定义转义字符，转义字符不会在<code>RUN</code>指令中执行<
 如下示例：</li>
 </ul>
 <pre><code>ENV abc=hello
- ENV abc=bye def=$abc
- ENV ghi=$abc
+ENV abc=bye def=$abc
+ENV ghi=$abc
 </code></pre>
 <p><code>def</code>的值为<code>hello</code>，而 <code>ghi</code>值为<code>bye</code>官方是如下解释的</p>
 <blockquote>

@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>docker file | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610865582642">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610865860286">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610865582642" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610865860286" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -97,7 +97,7 @@
 </blockquote>
 <h2 id="dockerfile">dockerfile</h2>
 <ul>
-<li>dockerfile必须以<code>FROM</code>指令开始</li>
+<li>dockerfile必须以<code>FROM</code>指令开始。<code>ARG</code>是唯一可以早于<code>FROM</code>执行的指令，查看<a href="ARG%E5%92%8CFROM%E7%9A%84%E4%BA%A4%E4%BA%92">ARG和FROM的交互</a></li>
 <li>dockerfile中以<code>#</code>来标示注释，注释会在dockerfile被执行前移除掉，以免对命令产生影响</li>
 </ul>
 <h3 id="解析器指令">解析器指令</h3>
@@ -108,29 +108,28 @@
 </code></pre>
 <p>△ 换行不符合规范</p>
 <pre><code># directive=value1
- # directive=value2
-
- FROM ImageName
+# directive=value2
+FROM ImageName
 </code></pre>
 <p>△ 出现两次</p>
 <pre><code>FROM ImageName
- # directive=value
+# directive=value
 </code></pre>
 <p>△ 在builder指令后面，会被认为是注释</p>
 <pre><code># About my dockerfile
- # directive=value
- FROM ImageName
+# directive=value
+FROM ImageName
 </code></pre>
 <p>△ 在注释后面，会被认为是注释</p>
 <pre><code># unknowndirective=value
- # knowndirective=value
+# knowndirective=value
 </code></pre>
 <p>△ 未知的解释器指令，会被认为是注释，第二行同样会被认为是注释</p>
 <pre><code>#directive=value
- # directive =value
- #	directive= value
- # directive = value
- #	  dIrEcTiVe=value
+# directive =value
+#	directive= value
+# directive = value
+#	  dIrEcTiVe=value
 </code></pre>
 <p>△ 上面几种写法会被认为是同一种写法，即无视空格，不区分大小写</p>
 <p>支持的解释器指令</p>
@@ -151,8 +150,8 @@ escape定义转义字符，转义字符不会在<code>RUN</code>指令中执行<
 如下示例：</li>
 </ul>
 <pre><code>ENV abc=hello
- ENV abc=bye def=$abc
- ENV ghi=$abc
+ENV abc=bye def=$abc
+ENV ghi=$abc
 </code></pre>
 <p><code>def</code>的值为<code>hello</code>，而 <code>ghi</code>值为<code>bye</code>官方是如下解释的</p>
 <blockquote>
