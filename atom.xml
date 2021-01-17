@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-17T09:51:17.838Z</updated>
+    <updated>2021-01-17T12:10:52.101Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -665,7 +665,121 @@ ADD [--chown=&lt;user&gt;:&lt;group&gt;] [&quot;&lt;src&gt;&quot;,... &quot;&lt;
 </ul>
 <h4 id="copy与add的区别">COPY与ADD的区别</h4>
 <p><code>ADD</code>支持使用 TAR文件和 URL路径,支持将tar格式的压缩文件解压到指定的目录</p>
-<h3 id=""></h3>
+<h3 id="label">LABEL</h3>
+<pre><code>LABEL &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; ...
+
+LABEL version=&quot;1.0&quot; description=&quot;这是一个github pages&quot; by=&quot;blog&quot;
+</code></pre>
+<h3 id="workdir">WORKDIR</h3>
+<pre><code>WORKDIR /path/to/workdir
+</code></pre>
+<p>WORKDIR为工作目录，可以出现多次，路径也可以为相对路径，不过，其是相对此前一个 WORKDIR指令指定的路径，还可以用由ENV定义的变量</p>
+<h3 id="volume">VOLUME</h3>
+<pre><code>VOLUME [&quot;/data&quot;]
+</code></pre>
+<p>定义卷，只能是docker管理的卷，，VOLUME为容器上的目录，用于在 image中创建一个挂载点目录，以挂载 Docker host上的卷或其它容器上的卷</p>
+<h3 id="expose">EXPOSE</h3>
+<pre><code>EXPOSE &lt;port&gt; [&lt;port&gt;/&lt;protocol&gt;...]
+</code></pre>
+<p>暴露指定端口，用于为容器打开指定要监听的端口以实现与外部通信</p>
+<p>&lt;protocol&gt;用于指定传输层协议，可为 tcp或udp二者之一，默认为 TCP协议</p>
+<p>EXPOSE指令可一次指定多个端口，但是不能指定暴露为宿主机的指定端口，因为指定的宿主机端口可能已经被占用，因此这里使用随机端口</p>
+<pre><code>[root@node1 img1]# vim Dockerfile 
+EXPOSE 80/tcp
+[root@node1 ~]# docker run --name tinyweb1 --rm tinyhttpd:v0.1-6 /bin/httpd -f -h data/web/html
+
+[root@node1 ~]# docker inspect tinyweb1                                                                                                                                         &quot;IPAddress&quot;: &quot;172.17.0.2&quot;,  
+
+[root@node1 ~]# curl 172.17.0.2
+&lt;h1&gt;twfr.github.io &lt;/h1&gt;
+[root@node1 ~]# docker port tinyweb1   //没有端口信息   即没有正真暴露出来
+</code></pre>
+<p>启动并暴露端口，注意，启动容器要跟大写P选项-P来暴露</p>
+<pre><code>[root@node1 ~]# docker run --name tinyweb1 --rm -P  tinyhttpd:v0.1-6 /bin/httpd -f -h /data/web/html
+
+[root@node1 ~]# curl 172.17.0.2
+&lt;h1&gt;twfr.github.io&lt;/h1&gt;
+[root@node1 ~]# docker port tinyweb1
+80/tcp -&gt; 0.0.0.0:32768
+</code></pre>
+<h3 id="env">ENV</h3>
+<pre><code>ENV &lt;key&gt;=&lt;value&gt; ...
+</code></pre>
+<p>有些变量在运行为容器时依然有用，因此需要把那些变量在运行为容器时重新定义为一个新的值，如果变量很多，可以放到一个文件中进行定义，使用参数 --env-list(docker run --help )实现，通过文件来加载环境变量</p>
+<pre><code>[root@node1 ~]# docker run --name tinyweb1 --rm -P -e WEB_SERVER_PACKAGE=&quot;nginx-1.15-6&quot; tinyhttpd:v0.1-7 printenv
+WEB_SERVER_PACKAGE=nginx-1.15-6
+</code></pre>
+<h3 id="arg">ARG</h3>
+<pre><code>ARG &lt;name&gt;[=&lt;default value&gt;]
+</code></pre>
+<p>ARG用于指定传递给构建运行时的变量</p>
+<pre><code>FROM ubuntu
+ARG CONT_IMG_VER
+ENV CONT_IMG_VER=${CONT_IMG_VER:-v1.0.0}
+RUN echo $CONT_IMG_VER
+</code></pre>
+<pre><code>docker build --build-arg CONT_IMG_VER=v2.0.1 .
+</code></pre>
+<h3 id="stopsignal">STOPSIGNAL</h3>
+<pre><code>STOPSIGNAL signal
+</code></pre>
+<p>STOPSIGNAL用于设置停止容器所要发送的系统调用信号：<br>
+所使用的信号必须是内核系统调用表中的合法的值，如：SIGKILL</p>
+<h3 id="user">USER</h3>
+<p>USER用于指定运行 image时的或运行 Dockerfile中任何 RUN、CMD或 ENTRYPOINT指令指定的程序时的用户名或 UID ，即改变容器中运行程序的身份<br>
+默认情况下， container的运行身份为 root用户<br>
+以下形式都是ok的：</p>
+<pre><code>USER user
+USER user:group
+USER uid
+USER uid:gid
+USER user:gid
+USER uid:group
+</code></pre>
+<h3 id="onbuild">ONBUILD</h3>
+<pre><code>ONBUILD &lt;INSTRUCTION&gt;
+</code></pre>
+<p>当将映像用作另一个构建的基础时，ONBUILD指令会将触发指令添加到映像中，以便稍后执行。触发器将在下游构建的上下文中执行，就像它已被插入到下游Dockerfile中的FROM指令之后一样。</p>
+<h3 id="dockerfile原则和建议">dockerfile原则和建议</h3>
+<ol>
+<li>容器轻量化。从镜像中产生的容器应该尽量轻量化，能在足够短的时间内停止、销毁、重新生成并替换原来的容器。</li>
+<li>使用 .gitignore。在大部分情况下，Dockerfile 会和构建所需的文件放在同一个目录中，为了提高构建的性能，应该使用 .gitignore 来过滤掉不需要的文件和目录。</li>
+<li>为了减少镜像的大小，减少依赖，仅安装需要的软件包。</li>
+<li>一个容器只做一件事。解耦复杂的应用，分成多个容器，而不是所有东西都放在一个容器内运行。如一个 Python Web 应用，可能需要 Server、DB、Cache、MQ、Log 等几个容器。一个更加极端的说法：One process per container。</li>
+<li>减少镜像的图层。不要多个 Label、ENV 等标签。</li>
+<li>对续行的参数按照字母表排序，特别是使用apt-get install -y安装包的时候。</li>
+<li>使用构建缓存。如果不想使用缓存，可以在构建的时候使用参数--no-cache=true来强制重新生成中间镜像。</li>
+</ol>
+<h2 id="docker生命周期">docker生命周期</h2>
+<h3 id="镜像">镜像</h3>
+<p>Docker 镜像可以看作是一个特殊的文件系统，除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。镜像不包含任何动态数据，其内容在构建之后也不会被改变。<br>
+镜像（Image）就是一堆只读层（read-only layer）的统一视角，这些层是Docker 内部的实现细节，并且能够在主机的文件系统上访问到。统一文件系统 (union file system) 技术能够将不同的层整合成一个文件系统，为这些层提供了一个统一的视角，这样就隐藏了多层的存在，在用户的角度看来，只存在一个文件系统。</p>
+<h3 id="容器">容器</h3>
+<p>容器 (container) 的定义和镜像 (image) 几乎一模一样，也是一堆层的统一视角，唯一区别在于容器的最上面那一层是可读可写的。<br>
+由于容器的定义并没有提及是否要运行容器，所以实际上，容器 = 镜像 + 读写层。</p>
+<h3 id="仓库">仓库</h3>
+<p>存放镜像的地方</p>
+<h2 id="docker架构">docker架构</h2>
+<p>核心组件包括：</p>
+<ul>
+<li>Docker Client<br>
+客户端可以构建，运行和停止应用程序，还可以远程与Docker_Host进行交互。最常用的 Docker 客户端就是 docker 命令，我们可以通过 docker 命令很方便地在 host 上构建和运行 docker 容器。</li>
+<li>Docker daemon<br>
+Docker daemon 是服务器组件，以 Linux 后台服务的方式运行，是 Docker 最核心的后台进程，我们也把它称为守护进程。它负责响应来自 Docker Client 的请求，然后将这些请求翻译成系统调用完成容器管理操作。该进程会在后台启动一个 API Server ，负责接收由 Docker Client 发送的请求，接收到的请求将通过Docker daemon 内部的一个路由分发调度，由具体的函数来执行请求。<br>
+docker daemon又可以分为docker server engine和job三部分<br>
+ocker Daemon 可以认为是通过 Docker Server 模块接受 Docker Client 的请求，并在 Engine 中处理请求，然后根据请求类型，创建出指定的 Job 并运行。 Docker Daemon 运行在 Docker host 上，负责创建、运行、监控容器，构建、存储镜像。</li>
+<li>Docker Image</li>
+<li>Docker Registry</li>
+<li>Docker Container<br>
+容器启动的过程大致如下：</li>
+</ul>
+<ol>
+<li>Docker 客户端执行 docker run 命令</li>
+<li>Docker daemon 发现本地没有我们需要的镜像</li>
+<li>daemon 从指定的镜像仓库下载镜像</li>
+<li>下载完成后，镜像被保存到本地</li>
+<li>Docker daemon 启动容器</li>
+</ol>
 ]]></content>
     </entry>
     <entry>
