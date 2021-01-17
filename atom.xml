@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-17T06:44:23.021Z</updated>
+    <updated>2021-01-17T06:52:25.971Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -449,7 +449,7 @@ func main() {
 </blockquote>
 <h2 id="dockerfile">dockerfile</h2>
 <ul>
-<li>dockerfile必须以<code>FROM</code>指令开始。<code>ARG</code>是唯一可以早于<code>FROM</code>执行的指令，查看<a href="ARG%E5%92%8CFROM%E7%9A%84%E4%BA%A4%E4%BA%92">ARG和FROM的交互</a></li>
+<li>dockerfile必须以<code>FROM</code>指令开始。<code>ARG</code>是唯一可以早于<code>FROM</code>执行的指令，<a href="#interact">ARG和FROM的交互</a></li>
 <li>dockerfile中以<code>#</code>来标示注释，注释会在dockerfile被执行前移除掉，以免对命令产生影响</li>
 </ul>
 <h3 id="解析器指令">解析器指令</h3>
@@ -531,7 +531,7 @@ README-secret.md  // README-secret.md作为特例要去除
 <li><code>AS name</code>是可选的，如果使用了，可以在下一次的<code>FROM</code>使用 <code>COPY --from=&lt;name&gt;</code>来关联上一次的构建镜像</li>
 <li><code>tag</code>和<code>digest</code>也是可选的，默认为<code>latest</code></li>
 </ul>
-<h4 id="arg和from的交互">ARG和FROM的交互</h4>
+<h4 id="a-nameinteractarg和from的交互a"><a name="interact">ARG和FROM的交互</a></h4>
 <p>FROM的变量是通过ARG来定义的，所以ARG是有可能先于FROM执行的，但是此时ARG是在构建阶段之外定义的，只能在FROM指令里面使用，在其他指令使用需要在执行一次没有值的ARG</p>
 <pre><code>ARG VERSION=latest
 FROM busybox:$VERSION
