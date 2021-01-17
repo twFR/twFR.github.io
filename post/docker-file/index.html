@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>docker file | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610866335438">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610869481062">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610866335438" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610869481062" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -97,7 +97,7 @@
 </blockquote>
 <h2 id="dockerfile">dockerfile</h2>
 <ul>
-<li>dockerfile必须以<code>FROM</code>指令开始。<code>ARG</code>是唯一可以早于<code>FROM</code>执行的指令，<a href="#interact">ARG和FROM的交互</a></li>
+<li>dockerfile必须以<code>FROM</code>指令开始。<code>ARG</code>是唯一可以早于<code>FROM</code>执行的指令，查看<a href="#interact">ARG和FROM的交互</a></li>
 <li>dockerfile中以<code>#</code>来标示注释，注释会在dockerfile被执行前移除掉，以免对命令产生影响</li>
 </ul>
 <h3 id="解析器指令">解析器指令</h3>
@@ -166,7 +166,7 @@ README-secret.md  // README-secret.md作为特例要去除
 </code></pre>
 <p>这里表示去掉所有markdown文件。但是不去除README相关的文件，除了README-secret.md这个文件</p>
 <h3 id="from">FROM</h3>
-<p>三种格式</p>
+<p>三种格式：</p>
 <pre><code>FROM [--platform=&lt;platform&gt;] &lt;image&gt; [AS &lt;name&gt;]
 </code></pre>
 <pre><code>FROM [--platform=&lt;platform&gt;] &lt;image&gt;[:&lt;tag&gt;] [AS &lt;name&gt;]
@@ -186,6 +186,20 @@ FROM busybox:$VERSION
 ARG VERSION     //空值ARG取上一次ARG的值
 RUN echo $VERSION &gt; image_version
 </code></pre>
+<h3 id="run">RUN</h3>
+<p>两种格式：</p>
+<pre><code>RUN &lt;command&gt;(shell form,the command is run in a shell, which by default is /bin/sh -c on Linux or cmd /S /C on Windows))
+</code></pre>
+<pre><code>RUN [&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;] (exec form)
+</code></pre>
+<p>RUN指令将在当前layer顶部的新layer执行命令，提交结果，生成的镜像将用于dockerfile下一步<br>
+例：</p>
+<pre><code>RUN /bin/bash -c 'source $HOME/.bashrc; echo $HOME'
+</code></pre>
+<pre><code>RUN [&quot;/bin/bash&quot;, &quot;-c&quot;, &quot;echo hello&quot;]  //execform 是解析称json数组的，所以只能用&quot;，不能用'
+</code></pre>
+<p>execform不会调用shell，如RUN[&quot;echo,&quot;<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>H</mi><mi>O</mi><mi>M</mi><mi>E</mi><mi mathvariant="normal">&quot;</mi><mo>]</mo><mo separator="true">,</mo><mi mathvariant="normal">不</mi><mi mathvariant="normal">会</mi><mi mathvariant="normal">在</mi></mrow><annotation encoding="application/x-tex">HOME&quot;],不会在</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.08125em;">H</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mord">&quot;</span><span class="mclose">]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord cjk_fallback">不</span><span class="mord cjk_fallback">会</span><span class="mord cjk_fallback">在</span></span></span></span>HOME上进行变量替换。要执行shell，需要这样：RUN [ &quot;sh&quot;, &quot;-c&quot;, &quot;echo $HOME&quot; ]。当使用execform并直接执行shell时（例如在shell表单中），是由shell进行环境变量扩展，而不是docker。<br>
+RUN指令的缓存不会自动失效。 诸如RUN apt-get dist-upgrade -y之类的指令的存将在下一个构建期间重用。 可以使用--no-cache标志使RUN指令的缓存无效，例如docker build --no-cache</p>
 
             </div>
           </article>
