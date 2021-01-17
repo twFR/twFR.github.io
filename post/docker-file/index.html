@@ -3,8 +3,8 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>docker file | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610869481062">
+<title>docker | 🌟谭先生✨</title>
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610877076140">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610869481062" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610877076140" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -78,7 +78,7 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              docker file
+              docker
             </h2>
             <div class="post-info">
               <time class="post-time">
@@ -200,6 +200,120 @@ RUN echo $VERSION &gt; image_version
 </code></pre>
 <p>execform不会调用shell，如RUN[&quot;echo,&quot;<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>H</mi><mi>O</mi><mi>M</mi><mi>E</mi><mi mathvariant="normal">&quot;</mi><mo>]</mo><mo separator="true">,</mo><mi mathvariant="normal">不</mi><mi mathvariant="normal">会</mi><mi mathvariant="normal">在</mi></mrow><annotation encoding="application/x-tex">HOME&quot;],不会在</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.08125em;">H</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mord">&quot;</span><span class="mclose">]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord cjk_fallback">不</span><span class="mord cjk_fallback">会</span><span class="mord cjk_fallback">在</span></span></span></span>HOME上进行变量替换。要执行shell，需要这样：RUN [ &quot;sh&quot;, &quot;-c&quot;, &quot;echo $HOME&quot; ]。当使用execform并直接执行shell时（例如在shell表单中），是由shell进行环境变量扩展，而不是docker。<br>
 RUN指令的缓存不会自动失效。 诸如RUN apt-get dist-upgrade -y之类的指令的存将在下一个构建期间重用。 可以使用--no-cache标志使RUN指令的缓存无效，例如docker build --no-cache</p>
+<h3 id="cmd">CMD</h3>
+<p>三种格式：</p>
+<pre><code>CMD [&quot;executable&quot;,&quot;param1&quot;,&quot;param2&quot;] (exec form, this is the preferred form)
+</code></pre>
+<pre><code>CMD [&quot;param1&quot;,&quot;param2&quot;] (as default parameters to ENTRYPOINT) //使用JSON数组格式指定，即只能使用 &quot;,不能使用'
+</code></pre>
+<pre><code>CMD command param1 param2 (shell form)   //在/ bin / sh -c中执行
+</code></pre>
+<p>CMD指令的首要目的在于为启动的容器指定默认要运行的程序，且其运行结束后，容器也将终止；不过， CMD指定的命令其可以被 docker run的命令行选项所覆盖 .在Dockerfile中可以存在多个 CMD指令，但仅最后一个会生效<br>
+如果用户为docker run指定了参数，则它们将覆盖CMD中指定的默认值</p>
+<h4 id="run和cmd的区别">RUN和CMD的区别</h4>
+<blockquote>
+<p>Do not confuse RUN with CMD. RUN actually runs a command and commits the result; CMD does not execute anything at build time, but specifies the intended command for the image.<br>
+RUN执行了命令并提交了结果，但是CMD在build期间没有执行热河东西，但是为镜像指定了预期的命令</p>
+</blockquote>
+<h3 id="entrypoint">ENTRYPOINT</h3>
+<p>两种格式：</p>
+<pre><code>ENTRYPOINT [&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;] (exec form)
+</code></pre>
+<pre><code>ENTRYPOINT command param1 param2 (shell form)
+</code></pre>
+<p>类似 CMD指令的功能，用于为容器指定默认运行程序，从而使得容器像是一个单独的可执行程序</p>
+<p>与CMD不同的是，由 ENTRYPOINT启动的程序不会被 docker run命令行指定的参数所覆盖，而且，这些命令行参数会被当作参数传递给 ENTRYPOINT指定指定的程序 ,ocker run 命令传入的命令参数会覆盖CMD指令的内容并且附加到ENTRYPOINT命令最后做为其参数使用, docker run命令的 --entrypoint选项的参数可覆盖ENTRYPOINT指令指定的程序<br>
+Dockerfile文件中也可以存在多个 ENTRYPOINT指令，但仅有最后一个会生效</p>
+<h4 id="cmd和entyypoint交互">CMD和ENTYYPOINT交互</h4>
+<p>Dockerfile应该指定CMD或ENTRYPOINT命令中的至少一个。<br>
+使用容器作为可执行文件时，应定义ENTRYPOINT。<br>
+CMD应该用作定义ENTRYPOINT命令或在容器中执行临时命令的默认参数的方式。<br>
+下表显示了针对不同ENTRYPOINT / CMD组合执行的命令：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>No ENTRYPOINT</th>
+<th>ENTRYPOINT exec_entry p1_entry</th>
+<th>ENTRYPOINT [“exec_entry”, “p1_entry”]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No CMD</td>
+<td>error, not allowed</td>
+<td>/bin/sh -c exec_entry p1_entry</td>
+<td>exec_entry p1_entry</td>
+</tr>
+<tr>
+<td>CMD [“exec_cmd”, “p1_cmd”]</td>
+<td>exec_cmd p1_cmd</td>
+<td>/bin/sh -c exec_entry p1_entry</td>
+<td>exec_entry p1_entry exec_cmd p1_cmd</td>
+</tr>
+<tr>
+<td>CMD [“p1_cmd”, “p2_cmd”]</td>
+<td>p1_cmd p2_cmd</td>
+<td>/bin/sh -c exec_entry p1_entry</td>
+<td>exec_entry p1_entry p1_cmd p2_cmd</td>
+</tr>
+<tr>
+<td>CMD exec_cmd p1_cmd</td>
+<td>/bin/sh -c exec_cmd p1_cmd</td>
+<td>/bin/sh -c exec_entry p1_entry</td>
+<td>exec_entry p1_entry /bin/sh -c exec_cmd p1_cmd</td>
+</tr>
+</tbody>
+</table>
+<h3 id="copy">COPY</h3>
+<p>两种形式</p>
+<pre><code>COPY [--chown=&lt;user&gt;:&lt;group&gt;] &lt;src&gt;... &lt;dest&gt;
+COPY [--chown=&lt;user&gt;:&lt;group&gt;] [&quot;&lt;src&gt;&quot;,... &quot;&lt;dest&gt;&quot;]  //在路径中有空白字符时通常使用此形式
+</code></pre>
+<p><code>--chown</code>仅支持用户构建linux容器的dockerfile<br>
+&lt;src&gt;：要复制的源文件或目录，支持使用通配符<br>
+&lt;dest&gt;：目标路径，即正在创建的 image的文件系统路径；建议为 &lt;dest&gt;使用绝对路径，&lt;dest&gt;绝对路径为镜像中的路径，而不是宿主机的路径。否则， <code>COPY</code>指定则以 <code>WORKDIR</code>为其起始路径</p>
+<ul>
+<li>文件复制准则
+<ol>
+<li>&lt;src&gt;必须是build上下文中的路径，即只能放在workshop这个工作目录下，不能是其父目录中的文件</li>
+<li>如果&lt;src&gt;是目录，其内部文件或者子目录会被递归复制，但&lt;src&gt;目录自身不会被复制</li>
+<li>如果指定了多个&lt;src&gt;，或在&lt;src&gt;中使用了通配符，则&lt;dest&gt;必须是一个目录，且&lt;dest&gt;目录必须以<code>/</code>结尾</li>
+<li>如果&lt;dest&gt;事先不存在，它将会被自动创建，这包括其父目录路径<br>
+例：</li>
+</ol>
+</li>
+</ul>
+<pre><code>
+[root@node1 ~]# mkdir img1/
+[root@node1 ~]# cd img1/
+[root@node1 img1]# ls
+[root@node1 img1]# vim index.html
+&lt;h1&gt;twfr.github.io &lt;/h1&gt;
+[root@node1 img1]# vim Dockerfile
+# Description: test image
+FROM busybox:latest
+MAINTAINER &quot;tanxin &lt;lovegood.xin@gmail.com&gt;&quot;
+COPY index.html /data/web/html/
+</code></pre>
+<h3 id="add">ADD</h3>
+<p>两种形式：</p>
+<pre><code>ADD [--chown=&lt;user&gt;:&lt;group&gt;] &lt;src&gt;... &lt;dest&gt;
+ADD [--chown=&lt;user&gt;:&lt;group&gt;] [&quot;&lt;src&gt;&quot;,... &quot;&lt;dest&gt;&quot;]
+</code></pre>
+<p><code>ADD</code>指令类似于<code>COPY</code>指令， <code>ADD</code>支持使用 TAR文件和 URL路径</p>
+<ul>
+<li>文件操作准则，同<code>COPY</code>，另外：
+<ol>
+<li>如果&lt;src&gt;为URL且&lt;dest&gt;不以/结尾，则&lt;src&gt;指定的文件将被下载并直接被创建为&lt;dest&gt;；如果&lt;dest&gt;以/结尾，则文件名URL指定的文件将被直接下载，并保存为&lt;dest&gt;/&lt;filename&gt;，注意，URL不能是ftp格式的url</li>
+<li>如果&lt;src&gt;是一个本地系统上的压缩格式的tar文件，它将被展开为一个目录，其行为类似于“tar -x”命令，然后，通过URL获取到的tar文件将不会自动展开</li>
+<li>如果&lt;src&gt;有多个，或其间接或直接使用了通配符，则&lt;dest&gt;必须是一个以/结尾的目录路径；如果&lt;dest&gt;不以<code>/</code>结尾，则其被视作一个普通文件，&lt;src&gt;的内容将被直接写入到&lt;dest&gt;</li>
+</ol>
+</li>
+</ul>
+<h4 id="copy与add的区别">COPY与ADD的区别</h4>
+<p><code>ADD</code>支持使用 TAR文件和 URL路径,支持将tar格式的压缩文件解压到指定的目录</p>
+<h3 id=""></h3>
 
             </div>
           </article>
