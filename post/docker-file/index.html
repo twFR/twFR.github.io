@@ -1,0 +1,244 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>docker file | 🌟谭先生✨</title>
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610864928505">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://twFR.github.io">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610864928505" alt="">
+  </a>
+  <h1 class="site-title">
+    🌟谭先生✨
+  </h1>
+  <p class="site-description">
+    敲不出代码的程序猿的🏠
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="https://www.facebook.com/xin.tan.106902" target="_blank">
+          <i class="fab fa-facebook"></i>
+        </a>
+      
+    
+  </div>
+</div>
+
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              docker file
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2021-01-17 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <blockquote>
+<p>reference: <a href="https://docs.docker.com/engine/reference/builder/">docker官方文档</a></p>
+</blockquote>
+<h2 id="dockerfile">dockerfile</h2>
+<ul>
+<li>dockerfile必须以<code>FROM</code>指令开始</li>
+<li>dockerfile中以<code>#</code>来标示注释，注释会在dockerfile被执行前移除掉，以免对命令产生影响</li>
+</ul>
+<h3 id="解析器指令">解析器指令</h3>
+<p>解析器指令放在最上面，以<code># directive=value</code>的形式来声明，一旦注释 空行或者builder指令执行，docker就不会再去招解析器指令，而是把它当成注释。<br>
+下面几种是不符合规范的场景：</p>
+<pre><code># direc \  
+ tive=value
+</code></pre>
+<p>△ 换行不符合规范</p>
+<pre><code># directive=value1
+ # directive=value2
+
+ FROM ImageName
+</code></pre>
+<p>△ 出现两次</p>
+<pre><code>FROM ImageName
+ # directive=value
+</code></pre>
+<p>△ 在builder指令后面，会被认为是注释</p>
+<pre><code># About my dockerfile
+ # directive=value
+ FROM ImageName
+</code></pre>
+<p>△ 在注释后面，会被认为是注释</p>
+<pre><code># unknowndirective=value
+ # knowndirective=value
+</code></pre>
+<p>△ 未知的解释器指令，会被认为是注释，第二行同样会被认为是注释</p>
+<pre><code>#directive=value
+ # directive =value
+ #	directive= value
+ # directive = value
+ #	  dIrEcTiVe=value
+</code></pre>
+<p>△ 上面几种写法会被认为是同一种写法，即无视空格，不区分大小写</p>
+<p>支持的解释器指令</p>
+<ul>
+<li>syntax<br>
+# syntax=[remote image reference]<br>
+这是用buldkit才会使用到的，为了指定构建当前dokcerfile的dokcerfile构建器的位置</li>
+<li>escape<br>
+# escape=\ (backslash) || # escape=` (backtick)<br>
+escape定义转义字符，转义字符不会在<code>RUN</code>指令中执行<br>
+例如在windows中将转义字符设置成`  很有用，因为windows目录格式是<code>C:\\</code>，但是在dockerfile里面会解析成<code>C:\</code>，就会找不到对应目录</li>
+</ul>
+<h3 id="环境变量">环境变量</h3>
+<p>环境变量以$variable_name 或者 ${variable_name}格式，同样支持以下bash风格的格式：</p>
+<ul>
+<li>${variable:-word}  如果<code>veriable</code>设置了值，结果就是这个值。如果没有，就是<code>word</code>结果，<code>word</code>可以是定值也可以是其他变量</li>
+<li>${variable:+word}  如果<code>veriable</code>设置了值，结果就是<code>word</code>。如果没有，就是空<br>
+如下示例：</li>
+</ul>
+<pre><code>ENV abc=hello
+ ENV abc=bye def=$abc
+ ENV ghi=$abc
+</code></pre>
+<p><code>def</code>的值为<code>hello</code>，而 <code>ghi</code>值为<code>bye</code>官方是如下解释的</p>
+<blockquote>
+<p>Environment variable substitution will use the same value for each variable throughout the entire instruction. In other words</p>
+</blockquote>
+<p>讲道理没看特明白，但是个人土味理解应该是说每行算一个<code>entire instruction</code>,这行的值都是不会变化的，所以<code>def</code>还是用的上一行的<code>hello</code>值，而<code>ghi</code> 则可以取到上一行执行后的结果</p>
+<h3 id="dockerignore-file">.dockerignore file</h3>
+<p><code>.dockerignore</code> file其实和git里面的.<code>gitignore</code>文件类似，docker CLI在发送context的时候会先寻找这个文件，然后将这个文件和文件里面的指定模式的文件去除掉，不发送给docker daemon。需要注意的是<code>!</code>这个符号的用法：</p>
+<pre><code>*.md                       //去掉所有md结尾的文件
+!README*.md          //README开头的md文件不去除
+README-secret.md  // README-secret.md作为特例要去除
+</code></pre>
+<p>这里表示去掉所有markdown文件。但是不去除README相关的文件，除了README-secret.md这个文件</p>
+<h3 id="from">FROM</h3>
+<p>三种格式</p>
+<pre><code>FROM [--platform=&lt;platform&gt;] &lt;image&gt; [AS &lt;name&gt;]
+</code></pre>
+<pre><code>FROM [--platform=&lt;platform&gt;] &lt;image&gt;[:&lt;tag&gt;] [AS &lt;name&gt;]
+</code></pre>
+<pre><code>FROM [--platform=&lt;platform&gt;] &lt;image&gt;[@&lt;digest&gt;] [AS &lt;name&gt;]
+</code></pre>
+<p><code>FROM</code>开始一个构建阶段，并且指定后面刚好构建指令的基础镜像</p>
+<ul>
+<li><code>FROM</code>可以在一个dokcerfile里面出现多次，构建多个构建镜像。只要在下一次<code>FROM</code>指令之前记住上一次image ID，两次构建就可以相互用来。每次<code>FROM</code>指令开始会清除上一次的指令</li>
+<li><code>AS name</code>是可选的，如果使用了，可以在下一次的<code>FROM</code>使用 <code>COPY --from=&lt;name&gt;</code>来关联上一次的构建镜像</li>
+<li><code>tag</code>和<code>digest</code>也是可选的，默认为<code>latest</code></li>
+</ul>
+<h4 id="arg和from的交互">ARG和FROM的交互</h4>
+<p>FROM的变量是通过ARG来定义的，所以ARG是有可能先于FROM执行的，但是此时ARG是在构建阶段之外定义的，只能在FROM指令里面使用，在其他指令使用需要在执行一次没有值的ARG</p>
+<pre><code>ARG VERSION=latest
+FROM busybox:$VERSION
+ARG VERSION     //空值ARG取上一次ARG的值
+RUN echo $VERSION &gt; image_version
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://twFR.github.io/post/docker/">
+              <h3 class="post-title">
+                docker 
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'db306bd8ac595ee09a0e',
+    clientSecret: '7e169f0897298c132e7c038d4d53e8fece891efb',
+    repo: 'twFR.github.io',
+    owner: 'twFR',
+    admin: ['twFR'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  真有意思 绝无可能
+不要慌 问题不大☘
+ | 
+  <a class="rss" href="https://twFR.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

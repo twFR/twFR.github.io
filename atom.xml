@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-16T10:47:17.020Z</updated>
+    <updated>2021-01-17T06:29:12.661Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,6 +10,170 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 🌟谭先生✨</rights>
+    <entry>
+        <title type="html"><![CDATA[docker file]]></title>
+        <id>https://twFR.github.io/post/docker-file/</id>
+        <link href="https://twFR.github.io/post/docker-file/">
+        </link>
+        <updated>2021-01-17T02:34:00.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>reference: <a href="https://docs.docker.com/engine/reference/builder/">docker官方文档</a></p>
+</blockquote>
+<h2 id="dockerfile">dockerfile</h2>
+<ul>
+<li>dockerfile必须以<code>FROM</code>指令开始</li>
+<li>dockerfile中以<code>#</code>来标示注释，注释会在dockerfile被执行前移除掉，以免对命令产生影响</li>
+</ul>
+<h3 id="解析器指令">解析器指令</h3>
+<p>解析器指令放在最上面，以<code># directive=value</code>的形式来声明，一旦注释 空行或者builder指令执行，docker就不会再去招解析器指令，而是把它当成注释。<br>
+下面几种是不符合规范的场景：</p>
+<pre><code># direc \  
+ tive=value
+</code></pre>
+<p>△ 换行不符合规范</p>
+<pre><code># directive=value1
+ # directive=value2
+
+ FROM ImageName
+</code></pre>
+<p>△ 出现两次</p>
+<pre><code>FROM ImageName
+ # directive=value
+</code></pre>
+<p>△ 在builder指令后面，会被认为是注释</p>
+<pre><code># About my dockerfile
+ # directive=value
+ FROM ImageName
+</code></pre>
+<p>△ 在注释后面，会被认为是注释</p>
+<pre><code># unknowndirective=value
+ # knowndirective=value
+</code></pre>
+<p>△ 未知的解释器指令，会被认为是注释，第二行同样会被认为是注释</p>
+<pre><code>#directive=value
+ # directive =value
+ #	directive= value
+ # directive = value
+ #	  dIrEcTiVe=value
+</code></pre>
+<p>△ 上面几种写法会被认为是同一种写法，即无视空格，不区分大小写</p>
+<p>支持的解释器指令</p>
+<ul>
+<li>syntax<br>
+# syntax=[remote image reference]<br>
+这是用buldkit才会使用到的，为了指定构建当前dokcerfile的dokcerfile构建器的位置</li>
+<li>escape<br>
+# escape=\ (backslash) || # escape=` (backtick)<br>
+escape定义转义字符，转义字符不会在<code>RUN</code>指令中执行<br>
+例如在windows中将转义字符设置成`  很有用，因为windows目录格式是<code>C:\\</code>，但是在dockerfile里面会解析成<code>C:\</code>，就会找不到对应目录</li>
+</ul>
+<h3 id="环境变量">环境变量</h3>
+<p>环境变量以$variable_name 或者 ${variable_name}格式，同样支持以下bash风格的格式：</p>
+<ul>
+<li>${variable:-word}  如果<code>veriable</code>设置了值，结果就是这个值。如果没有，就是<code>word</code>结果，<code>word</code>可以是定值也可以是其他变量</li>
+<li>${variable:+word}  如果<code>veriable</code>设置了值，结果就是<code>word</code>。如果没有，就是空<br>
+如下示例：</li>
+</ul>
+<pre><code>ENV abc=hello
+ ENV abc=bye def=$abc
+ ENV ghi=$abc
+</code></pre>
+<p><code>def</code>的值为<code>hello</code>，而 <code>ghi</code>值为<code>bye</code>官方是如下解释的</p>
+<blockquote>
+<p>Environment variable substitution will use the same value for each variable throughout the entire instruction. In other words</p>
+</blockquote>
+<p>讲道理没看特明白，但是个人土味理解应该是说每行算一个<code>entire instruction</code>,这行的值都是不会变化的，所以<code>def</code>还是用的上一行的<code>hello</code>值，而<code>ghi</code> 则可以取到上一行执行后的结果</p>
+<h3 id="dockerignore-file">.dockerignore file</h3>
+<p><code>.dockerignore</code> file其实和git里面的.<code>gitignore</code>文件类似，docker CLI在发送context的时候会先寻找这个文件，然后将这个文件和文件里面的指定模式的文件去除掉，不发送给docker daemon。需要注意的是<code>!</code>这个符号的用法：</p>
+<pre><code>*.md                       //去掉所有md结尾的文件
+!README*.md          //README开头的md文件不去除
+README-secret.md  // README-secret.md作为特例要去除
+</code></pre>
+<p>这里表示去掉所有markdown文件。但是不去除README相关的文件，除了README-secret.md这个文件</p>
+<h3 id="from">FROM</h3>
+<p>三种格式</p>
+<pre><code>FROM [--platform=&lt;platform&gt;] &lt;image&gt; [AS &lt;name&gt;]
+</code></pre>
+<pre><code>FROM [--platform=&lt;platform&gt;] &lt;image&gt;[:&lt;tag&gt;] [AS &lt;name&gt;]
+</code></pre>
+<pre><code>FROM [--platform=&lt;platform&gt;] &lt;image&gt;[@&lt;digest&gt;] [AS &lt;name&gt;]
+</code></pre>
+<p><code>FROM</code>开始一个构建阶段，并且指定后面刚好构建指令的基础镜像</p>
+<ul>
+<li><code>FROM</code>可以在一个dokcerfile里面出现多次，构建多个构建镜像。只要在下一次<code>FROM</code>指令之前记住上一次image ID，两次构建就可以相互用来。每次<code>FROM</code>指令开始会清除上一次的指令</li>
+<li><code>AS name</code>是可选的，如果使用了，可以在下一次的<code>FROM</code>使用 <code>COPY --from=&lt;name&gt;</code>来关联上一次的构建镜像</li>
+<li><code>tag</code>和<code>digest</code>也是可选的，默认为<code>latest</code></li>
+</ul>
+<h4 id="arg和from的交互">ARG和FROM的交互</h4>
+<p>FROM的变量是通过ARG来定义的，所以ARG是有可能先于FROM执行的，但是此时ARG是在构建阶段之外定义的，只能在FROM指令里面使用，在其他指令使用需要在执行一次没有值的ARG</p>
+<pre><code>ARG VERSION=latest
+FROM busybox:$VERSION
+ARG VERSION     //空值ARG取上一次ARG的值
+RUN echo $VERSION &gt; image_version
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[docker ]]></title>
+        <id>https://twFR.github.io/post/docker/</id>
+        <link href="https://twFR.github.io/post/docker/">
+        </link>
+        <updated>2021-01-17T02:34:00.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>reference: <a href="https://docs.docker.com/engine/reference/builder/">docker官方文档</a></p>
+</blockquote>
+<h2 id="dockerfile">dockerfile</h2>
+<ul>
+<li>
+<p>dockerfile必须以<code>FROM</code>指令开始</p>
+</li>
+<li>
+<p>dockerfile中以<code>#</code>来标示注释，注释会在dockerfile被执行前移除掉，以免对命令产生影响</p>
+</li>
+<li>
+<p>解析器指令<br>
+解析器指令放在最上面，以<code># directive=value</code>的形式来声明，一旦注释 空行或者builder指令执行，docker就不会再去招解析器指令，而是把它当成注释。<br>
+下面几种是不符合规范的场景：</p>
+<pre><code># direc \  
+tive=value
+</code></pre>
+<p>△ 换行不符合规范</p>
+<pre><code># directive=value1
+# directive=value2
+
+FROM ImageName
+</code></pre>
+<p>△ 出现两次</p>
+<pre><code>FROM ImageName
+# directive=value
+</code></pre>
+<p>△ 在builder指令后面，会被认为是注释</p>
+<pre><code># About my dockerfile
+# directive=value
+FROM ImageName
+</code></pre>
+<p>△ 在注释后面，会被认为是注释</p>
+<pre><code># unknowndirective=value
+# knowndirective=value
+</code></pre>
+<p>△ 未知的解释器指令，会被认为是注释，第二行同样会被认为是注释</p>
+<pre><code>#directive=value
+# directive =value
+#	directive= value
+# directive = value
+#	  dIrEcTiVe=value
+</code></pre>
+<p>△ 上面几种写法会被认为是同一种写法，即无视空格，不区分大小写</p>
+<p>支持的解释器指令</p>
+<ul>
+<li>syntax
+<h1 id="syntaxremote-image-reference">syntax=[remote image reference]</h1>
+这是用buldkit才会使用到的，为了指定构建当前dokcerfile的dokcerfile构建器的位置</li>
+</ul>
+</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Time Format]]></title>
         <id>https://twFR.github.io/post/time-format/</id>
@@ -1076,202 +1240,6 @@ func search() {
 	}
 	// 这是有剩余巧克力的情况
 	fmt.Println(mid)
-}
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Insert sort]]></title>
-        <id>https://twFR.github.io/post/insert-sort/</id>
-        <link href="https://twFR.github.io/post/insert-sort/">
-        </link>
-        <updated>2019-11-15T15:36:02.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="需求">需求</h2>
-<p>输入n个数字，（第一行数字表示将要输入数字的个数）<br>
-按从小到大的顺序排序后一行输出</p>
-<h2 id="示例">示例</h2>
-<p>输入：</p>
-<blockquote>
-<p>5<br>
-12<br>
-45<br>
-2<br>
-14<br>
-1</p>
-</blockquote>
-<p>输出：</p>
-<blockquote>
-<p>1 2 12 14 45</p>
-</blockquote>
-<h2 id="解题思路">解题思路</h2>
-<p>今天使用插入排序来解决这个问题</p>
-<ul>
-<li>循环需要排序的数组</li>
-<li>从第二个数字开始，和前一个比较，如果比前一个小，就说明这第i个数字n需要重新排序</li>
-<li>将这个数字和前面的所有数字比较，当n比第j个数字位置小的时候（j&lt;i），则说明这个j位置就是n需要插入的位置</li>
-<li>将j位置到i-1位置的数字全部顺序向后移动一个位置，即将【i-1】赋给【i】，最后将最开始的【i】赋给【j】</li>
-<li>循环完数组则排序完毕，over</li>
-</ul>
-<pre><code>func insertSort(disorderNumber []int) []int {
-	for i := 1; i &lt; len(disorderNumber); i++ {
-		if disorderNumber[i] &lt; disorderNumber[i-1] {
-			for j := 0; j &lt; i; j++ {
-				if disorderNumber[j] &gt; disorderNumber[i] {
-					// 插入位置
-					temp := disorderNumber[i]
-					// 将插入位置后面的数到需要插入的数整体后移一位
-					for k := i; k &gt; j; k-- {
-						disorderNumber[k] = disorderNumber[k-1]
-					}
-					disorderNumber[j] = temp
-				}
-				// 如果找到插入位置，则不需要再向后面循环
-				break
-			}
-		}
-	}
-	return disorderNumber
-}
-</code></pre>
-<h2 id="完整代码">完整代码</h2>
-<pre><code>package main
-
-import (
-	&quot;fmt&quot;
-	&quot;os&quot;
-	&quot;strconv&quot;
-)
-
-func main() {
-	var num int
-	n, err := fmt.Scanf(&quot;%d&quot;, &amp;num)
-	if n != 1 || err != nil {
-		os.Exit(1)
-	}
-	disorderNumber := make([]int, num)
-	for i := 0; i &lt; num; i++ {
-		n, err := fmt.Scanf(&quot;%d&quot;, &amp;disorderNumber[i])
-		if n != 1 || err != nil {
-			fmt.Println(n,err)
-			os.Exit(1)
-		}
-	}
-	orderNumber := insertSort(disorderNumber)
-	for i := 0; i &lt; len(orderNumber); i++ {
-		fmt.Print(strconv.Itoa(orderNumber[i]) + &quot; &quot;)
-	}
-}
-
-func insertSort(disorderNumber []int) []int {
-	for i := 1; i &lt; len(disorderNumber); i++ {
-		if disorderNumber[i] &lt; disorderNumber[i-1] {
-			for j := 0; j &lt; i; j++ {
-				if disorderNumber[j] &gt; disorderNumber[i] {
-					// 插入位置
-					temp := disorderNumber[i]
-					// 将插入位置后面的数到需要插入的数整体后移一位
-					for k := i; k &gt; j; k-- {
-						disorderNumber[k] = disorderNumber[k-1]
-					}
-					disorderNumber[j] = temp
-				}
-				// 如果找到插入位置，则不需要再向后面循环
-				break
-			}
-		}
-	}
-	return disorderNumber
-}
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Multiplication by large numbers]]></title>
-        <id>https://twFR.github.io/post/multiplication-by-large-numbers/</id>
-        <link href="https://twFR.github.io/post/multiplication-by-large-numbers/">
-        </link>
-        <updated>2019-11-14T14:02:22.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="需求">需求</h2>
-<p>求n的阶乘（0&lt;n&lt;1000）</p>
-<h2 id="示例">示例</h2>
-<p>输入：</p>
-<blockquote>
-<p>2<br>
-3</p>
-</blockquote>
-<p>输出：</p>
-<blockquote>
-<p>2<br>
-6</p>
-</blockquote>
-<h2 id="解题思路">解题思路</h2>
-<p>普通的数据类型肯定没法承载精确的大数的阶层，所以这实际就是一个大数相乘算法</p>
-<ul>
-<li>用一个数组来装大数的每一位</li>
-<li>用数组的每一个值去乘被乘数</li>
-<li>将数组从后往前进位然后留值，因为数字相邻两位相差10的倍数，就以10进1，例如数组最后一位为102，则向前进10，留2</li>
-<li>最后顺序打出不换行的数组每个值就是结果，需要注意的是数组的长度</li>
-</ul>
-<pre><code>func multiplication(largeNumber [1000]int, number int) [1000]int {
-	for i := 0; i &lt; len(largeNumber); i++ {
-		largeNumber[i] = largeNumber[i] * number
-	}
-	for i := len(largeNumber) - 1; i &gt; 0; i-- {
-		// 进位
-		largeNumber[i-1] = largeNumber[i]/10 + largeNumber[i-1]
-		// 留值
-		largeNumber[i] = largeNumber[i] % 10
-	}
-	return largeNumber
-}
-</code></pre>
-<h2 id="完整实现">完整实现</h2>
-<pre><code>package main
-
-import (
-	&quot;fmt&quot;
-	&quot;os&quot;
-)
-
-func main() {
-	for {
-		var num int
-		var largeNumber [1000]int
-		n, err := fmt.Scanf(&quot;%d&quot;, &amp;num)
-		if n != 1 || err != nil {
-			os.Exit(1)
-		}
-		// 最后一位给1
-		largeNumber[len(largeNumber)-1] = 1
-		for i := 1; i &lt;= num; i++ {
-			largeNumber = multiplication(largeNumber, i)
-		}
-		// 数组中不为0的第一个数
-		min := 0
-		for i := 0; i &lt; len(largeNumber); i++ {
-			if largeNumber[i] != 0 {
-				min = i
-				break
-			}
-		}
-		for i := min; i &lt; len(largeNumber); i++ {
-			fmt.Print(largeNumber[i])
-		}
-		fmt.Println()
-	}
-}
-
-func multiplication(largeNumber [1000]int, number int) [1000]int {
-	for i := 0; i &lt; len(largeNumber); i++ {
-		largeNumber[i] = largeNumber[i] * number
-	}
-	for i := len(largeNumber) - 1; i &gt; 0; i-- {
-		// 进位
-		largeNumber[i-1] = largeNumber[i]/10 + largeNumber[i-1]
-		// 留值
-		largeNumber[i] = largeNumber[i] % 10
-	}
-	return largeNumber
 }
 </code></pre>
 ]]></content>
