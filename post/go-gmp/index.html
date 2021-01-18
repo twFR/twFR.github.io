@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>关于 | 🌟谭先生✨</title>
+<title>GO GMP | 🌟谭先生✨</title>
 <link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610978224654">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
@@ -78,29 +78,40 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              关于
+              GO GMP
             </h2>
             <div class="post-info">
               <time class="post-time">
-                · 2019-01-25 ·
+                · 2020-01-20 ·
               </time>
+              
+                <a href="https://twFR.github.io/tag/Z7--HtZrc/" class="post-tag">
+                  # golang
+                </a>
               
             </div>
             
-              <div class="post-feature-image" style="background-image: url('https://twFR.github.io/post-images/about.JPG')">
-              </div>
-            
             <div class="post-content">
-              <p>如约而至<br>
-是个多美好的词<br>
-等的辛苦<br>
-却从不辜负🍓</p>
-<p>愿生活美好 加油☘️</p>
+              <p><code>M</code>指<code>machine</code>，一个<code>M</code>直接关联一个内核线程，有操作系统管理</p>
+<p><code>P</code>值<code>processor</code>,代表了<code>M</code>所需要的上下文环境，也是处理用户级代码逻辑的处理器，负责衔接<code>M</code>和<code>G</code>的调度上下文，将等待执行的<code>G</code>与<code>M</code>对接。一般来说，<code>P</code>的数量由环境变量中<code>GOMAXPROCS</code>决定，通常与核心数对应</p>
+<p><code>G</code>就是<code>goroutine</code> ，包括了调用栈，重要的调度信息，如channel等</p>
+<p>一个<code>M</code>会对应一个内核线程，一个M也会链接一个上下文<code>P</code>，一个上下文<code>P</code>又会连接一个或者多个<code>G</code>形成runqueues。通过关键字<code>go</code>启动一个<code>G</code>加入runqueues队列末尾，一旦上下文运行到调度点，<code>Goroutine</code>会从runqueues弹出，设置堆栈和指令指针开始运行<code>Goroutine</code></p>
+<p>如果<code>M0</code>遇到一个syscall内核线程阻塞，这时候<code>M0</code>会放弃当前的上下文环境<code>P0</code>，<code>P0</code>会被其它<code>M</code>（新创建或者线程缓存）接受，以便让<code>P0</code>下面的<code>Goroutine</code>能被调度执行。而当<code>M0</code> syscall结束后，会尝试去偷一个上下文<code>P</code>，如果不成功，会把先面刚刚执行的<code>G</code>放到全局的<code>Goroutine</code>然后自己置于线程缓存中进入休眠状态。</p>
+<p>P会周期性检查全局的runqueues队列里面的<code>Goroutine</code>，以便在消费自身<code>Goroutine</code>队列后继续执行全局runqueues，如果全局也没有了，P在跑完自己runqueues之后，会去其它的<code>P</code>中偷一半过来</p>
 
             </div>
           </article>
         </div>
 
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://twFR.github.io/post/golang-gc/">
+              <h3 class="post-title">
+                GC
+              </h3>
+            </a>
+          </div>
         
 
         
