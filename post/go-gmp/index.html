@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>GO GMP | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610978224654">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610979031539">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610978224654" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610979031539" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -98,6 +98,9 @@
 <p>一个<code>M</code>会对应一个内核线程，一个M也会链接一个上下文<code>P</code>，一个上下文<code>P</code>又会连接一个或者多个<code>G</code>形成runqueues。通过关键字<code>go</code>启动一个<code>G</code>加入runqueues队列末尾，一旦上下文运行到调度点，<code>Goroutine</code>会从runqueues弹出，设置堆栈和指令指针开始运行<code>Goroutine</code></p>
 <p>如果<code>M0</code>遇到一个syscall内核线程阻塞，这时候<code>M0</code>会放弃当前的上下文环境<code>P0</code>，<code>P0</code>会被其它<code>M</code>（新创建或者线程缓存）接受，以便让<code>P0</code>下面的<code>Goroutine</code>能被调度执行。而当<code>M0</code> syscall结束后，会尝试去偷一个上下文<code>P</code>，如果不成功，会把先面刚刚执行的<code>G</code>放到全局的<code>Goroutine</code>然后自己置于线程缓存中进入休眠状态。</p>
 <p>P会周期性检查全局的runqueues队列里面的<code>Goroutine</code>，以便在消费自身<code>Goroutine</code>队列后继续执行全局runqueues，如果全局也没有了，P在跑完自己runqueues之后，会去其它的<code>P</code>中偷一半过来</p>
+<blockquote>
+<p><a href="https://segmentfault.com/a/1190000018775901">扩展，大神详解go调度器</a></p>
+</blockquote>
 
             </div>
           </article>
