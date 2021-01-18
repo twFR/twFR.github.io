@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>golang summary | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610963493849">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1610970903111">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610963493849" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1610970903111" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -767,54 +767,6 @@ go env -w GOPROXY=https://goproxy.cn,https://goproxy.io,direct   //1.13 后
 </li>
 <li>查找依赖<pre><code>go mod why
 </code></pre>
-</li>
-</ul>
-<h2 id="golang-gc">golang GC</h2>
-<p>三种经典GC算法：</p>
-<ul>
-<li>
-<p>引用计数：<br>
-把所有单元放在一个单元池。这样所有的单元就串起来了，就可以进行引用计数了。新分配的单元计数值被设置为1（注意不是 0，因为申请一般都说 ptr = new object 这种）。每次有一个指针被设为指向该单元时，该单元计数值加1；而每次删除某个指向它的指针时，它的计数值减1.当其引用数为0的的时候，该单元被回收。<br>
-优点：</p>
-<ul>
-<li>渐进式。内存管理与用户程序的执行交织在一起，将 GC 的代价分散到整个程序。不像标记-清扫算法需要 STW (Stop The World，GC 的时候挂起用户程序)。</li>
-<li>算法易于实现</li>
-<li>内存单元能够很快被回收。相比于其他垃圾回收算法，堆被耗尽或者达到某个阈值才会进行垃圾回收。<br>
-缺点：</li>
-<li>原始的引用计数不能处理循环引用。</li>
-<li>维护引用计数降低运行效率。内存单元的更新删除等都需要维护相关的内存单元的引用计数，相比于一些追踪式的垃圾回收算法并不需要这些代价。</li>
-<li>单元池 free list 实现的话不是 cache-friendly 的，这样会导致频繁的 cache miss，降低程序运行效率。</li>
-</ul>
-</li>
-<li>
-<p>标记-清扫算法<br>
-自动内存管理，基于追踪的垃圾收集算法。内存单元并不会在变成垃圾立刻回收，而是保持不可达状态，直到到达某个阈值或者固定时间长度。这个时候系统会挂起用户程序，也就是 STW，转而执行垃圾回收程序。算法分两个部分：标记（mark）和清扫（sweep）。标记阶段表明所有的存活单元，清扫阶段将垃圾单元回收。</p>
-</li>
-<li>
-<p>三色标记算法<br>
-对标记算法的改进</p>
-<ol>
-<li>起初所有的对象都是白的</li>
-<li>从根出发扫描所有可达对象，将其置灰放入一个队列里面</li>
-<li>然后从这个队列里面取对象，将本身置黑放入另一个队列，将他的引用对象标灰放入灰队列里面</li>
-<li>重复3，直到灰为空。白色即为垃圾，进行回收</li>
-</ol>
-<p>根对象如何而来呢，生命周期可以保证的对象是根对象，<font color=red><strong>线程栈</strong></font>本身就是一个根,线程栈里面可能存了某个对象的指针，那线程栈就会引用那个对象，所以像全局变量，线程栈这些就是根对象。</p>
-<ul>
-<li>
-<p>回收可以和用户逻辑并发：<br>
-扫描结束后只有黑白对象，黑对象是需要使用的，不需要动。白色是肯定不会被使用的垃圾，所有用户线程肯定都不会使用，所以回收操作和用户逻辑是可以并发的。所以回收操作不放在STW的时间里面</p>
-</li>
-<li>
-<p>扫描也可以和用户逻辑并发-- hybrid write barrier（混合写屏障）：<br>
-该屏障之前的写操作和之后的写操作相比，先被系统其它组件感知<br>
-刚把一个对象标为白色，用户逻辑突然引用了它，这时就用到写屏障。先做一次简单的STW，执行简单的状态处理，接下来对内存扫描，这个时候用户逻辑就可以执行了。所有新建的对象直接置黑不管，下一次再说，已经扫描过的对象可能因此发生状态改变，所以对扫描过后的对象使⽤操作系统写屏障功能⽤来监控⽤户逻辑这段内存。任何时候这段内存发⽣引⽤改变的时候就会造成写屏障发⽣⼀个信号，垃圾回收器会捕获到这样的信号后就知道这个对象发⽣改变，然后重新扫描这个对象，看看它的引⽤或者被引⽤是否被改变。这样看来，扫描操作也是可以和用户逻辑并发的</p>
-</li>
-<li>
-<p>辅助回收<br>
-如果扫描的速度跟不上用户分配的速度，会造成扫描永远结束不了，这种情况会导致内存膨胀。出现这种情况，go还是会把用户逻辑暂停，然后把用户线程抢过来加入垃圾回收提升速度，这就是辅助回收。</p>
-</li>
-</ul>
 </li>
 </ul>
 <p><font size=100><strong>持续学习.....</strong></font></p>
