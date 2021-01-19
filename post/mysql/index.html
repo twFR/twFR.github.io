@@ -1,0 +1,203 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>mysql | 🌟谭先生✨</title>
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1611054116695">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://twFR.github.io">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1611054116695" alt="">
+  </a>
+  <h1 class="site-title">
+    🌟谭先生✨
+  </h1>
+  <p class="site-description">
+    敲不出代码的程序猿的🏠
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="https://www.facebook.com/xin.tan.106902" target="_blank">
+          <i class="fab fa-facebook"></i>
+        </a>
+      
+    
+  </div>
+</div>
+
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              mysql
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2021-01-19 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <h2 id="sql执行过程">sql执行过程</h2>
+<p>大体来说，mysql可以分为server层和引擎层两部分</p>
+<p>Server层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖MySQL的大多数核心服务功能，以及所有的内置函数（如日期、时间、数学和加密函数等），所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图等</p>
+<p>存储引擎层负责数据的存储和提取，支持 InnoDB、MyISAM、Memory 等多个存储引擎，现在的默认引擎是<font color=red>InnoDB</font></p>
+<p>执行sql的大致流程如下：</p>
+<ol>
+<li>远程或者本地连接上数据后，执行sql命令</li>
+<li>sql命令发送到服务端，首先查询缓存（在8.0取消了缓存机制），缓存以key-value形式存储在内存中，key是查询语句，value是查询结果。缓存中如果找到对应的key，就直接返回结果</li>
+<li>如果找不到缓存，就要真正执行sql了。mysql的<code>分析器</code>先做<code>词法分析</code>，把sql里面的字符串是什么，代表什么识别出来；然后做<code>语法分析</code>,判断输入的sql语句是否满足语法（做什么）</li>
+<li>分析完之后，mysql就会知道要做什么了，然后<code>优化器</code>开始工作。如果有索引，优化器会决定使用哪个索引，或者多表连接的时候，决定各个表的连接顺序（怎么做）</li>
+<li>优化完毕，开始执行语句之前，会先判断是否有权限去操作表，如果有的话，就打开表继续执行，<code>执行器</code>根据表引擎定义，使用这个引擎提供的接口，获取数据将结果返回给客户端</li>
+</ol>
+<h2 id="mysql-索引">mysql 索引</h2>
+<p>索引的目的是为了加快查询速度，是存储引擎用于快速找到记录的一种数据结构。</p>
+<h3 id="索引分类">索引分类</h3>
+<ul>
+<li>普通索引index :加速查找</li>
+<li>唯一索引
+<ul>
+<li>主键索引：primary key ：加速查找+约束（不为空且唯一）</li>
+<li>唯一索引：unique：加速查找+约束 （唯一）</li>
+</ul>
+</li>
+<li>联合索引
+<ul>
+<li>primary key(id,name):联合主键索引</li>
+<li>unique(id,name):联合唯一索引</li>
+<li>index(id,name):联合普通索引</li>
+</ul>
+</li>
+<li>全文索引fulltext :用于搜索很长一篇文章的时候，效果最好。</li>
+<li>空间索引spatial :了解就好，几乎不用</li>
+</ul>
+<h3 id="索引算法">索引算法</h3>
+<ul>
+<li>
+<p>哈希索引 （查询单条快，范围查询慢）<br>
+hash索引结构的特殊性，其检索效率非常高，索引的检索可以一次定位，不像B-Tree索引需要从根节点到枝节点，最后才能访问到页节点这样多次的IO访问，所以Hash索引的查询效率要远高于B-Tree索引<br>
+但hash索引由于起特殊性也带来了很多限制和弊端：</p>
+<ol>
+<li>hash索引只支持等值比较查询，包括＝、 IN 、&lt;=&gt;  (注意&lt;&gt;和＜＝＞是不同的操作，不支持任何范围查询，如&gt; &lt; like等，因为经过相应的Hash算法处理之后的Hash值的大小关系，并不能保证和Hash运算前完全一样</li>
+<li>Hash索引无法被用来避免数据的排序操作</li>
+<li>Hash索引不能利用部分索引键查询，对于组合索引，Hash索引在计算Hash值的时候是组合索引键合并后再一起计算Hash值，而不是单独计算Hash值，所以通过组合索引的前面一个或几个索引键进行查询的时候，Hash索引也无法被利用</li>
+<li>Hash索引在任何时候都不能避免表扫描。Hash索引是将索引键通过Hash运算之后，将 Hash运算结果的Hash值和所对应的行指针信息存放于一个Hash表中，于不同索引键存在相同Hash值，所以即使取满足某个Hash键值的数据的记录条数，也无法从Hash索引中直接完成查询，还是要通过访问表中的实际数据进行相应的比较，并得到相应的结果。</li>
+<li>hash索引遇到大量Hash值相等的情况后性能并不一定就会比BTree索引高。对于选择性比较低的索引键，如果创建Hash索引，那么将会存在大量记录指针信息存于同一个Hash值相关联。这样要定位某一条记录时就会非常麻烦，会浪费多次表数据的访问，而造成整体性能低下</li>
+</ol>
+</li>
+<li>
+<p>BTree索引（b+树，层数越多，数据量指数级增长，innodb默认支持）<br>
+磁盘io预读策略，当一次io的时候，不光把当前磁盘地址的数据，而是把相邻的数据也读到内存缓冲区内，BTree索引就用到了这个策略</p>
+<p><img src="http://www.liuzk.com/wp-content/uploads/2019/11/7.jpg" alt="B+数" loading="lazy"><br>
+B+数是一个从顶层向下查找的树，顶层存放</p>
+</li>
+</ul>
+
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://twFR.github.io/post/time-format/">
+              <h3 class="post-title">
+                Time Format
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'db306bd8ac595ee09a0e',
+    clientSecret: '7e169f0897298c132e7c038d4d53e8fece891efb',
+    repo: 'twFR.github.io',
+    owner: 'twFR',
+    admin: ['twFR'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  真有意思 绝无可能
+不要慌 问题不大☘
+ | 
+  <a class="rss" href="https://twFR.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
