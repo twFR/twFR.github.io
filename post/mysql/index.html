@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>mysql | 🌟谭先生✨</title>
-<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1611061214789">
+<link rel="shortcut icon" href="https://twFR.github.io/favicon.ico?v=1611061622375">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://twFR.github.io/styles/main.css">
@@ -20,7 +20,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://twFR.github.io">
-  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1611061214789" alt="">
+  <img class="avatar" src="https://twFR.github.io/images/avatar.png?v=1611061622375" alt="">
   </a>
   <h1 class="site-title">
     🌟谭先生✨
@@ -153,6 +153,39 @@ hash索引结构的特殊性，其检索效率非常高，索引的检索可以�
 <li>索引的字段尽量的小：通过上述的流程可以看出，IO次数取决于b+数的高度h，假设当前数据表的数据为N，每个磁盘块的数据项的数量是m，则有h=㏒(m+1)N，当数据量N一定的情况下，m越大，h越小；而m = 磁盘块的大小 / 数据项的大小，磁盘块的大小也就是一个数据页的大小，是固定的，如果数据项占的空间越小，数据项的数量越多，树的高度越低。这就是为什么每个数据项，即索引字段要尽量的小，比如int占4字节，要比bigint8字节少一半。这也是为什么b+树要求把真实的数据放到叶子节点而不是内层节点，一旦放到内层节点，磁盘块的数据项会大幅度下降，导致树增高。当数据项等于1时将会退化成线性表。</li>
 <li>索引的最左匹配特性：当B+树是符合数据结构时，B+树是按照从左到右的顺序简历搜索树的，比如（name，age，sex），B+树会先通过name来比较后才能根据age，sex比较，检索到数据。如果name缺失，那B+树就不知道如何下手了，此时就不会用此索引了，必须按从左到右顺序来进行匹配，这就是最左匹配原则</li>
 </ul>
+</li>
+</ul>
+<h3 id="索引创建与删除">索引创建与删除</h3>
+<ul>
+<li>创建索引
+<ol>
+<li>建表就创</li>
+</ol>
+<pre><code>create table s1(
+id int ,
+name char(20),
+age int,
+email varchar(30)
+index(id) #可以这样加
+#primary key(id) #也可以在这加
+);
+</code></pre>
+<ol start="2">
+<li>建表后创建</li>
+</ol>
+<pre><code>```
+create index name on s1(name); #添加普通索引
+create unique age on s1(age);添加唯一索引
+alter table s1 add primary key(id); #添加住建索引，也就是给id字段增加一个主键
+create index name on s1(id,name); #添加普通联合索引
+```
+</code></pre>
+</li>
+<li>删除索引<pre><code>drop index id on s1;
+drop index name on s1; #删除普通索引
+drop index age on s1; #删除唯一索引，就和普通索引一样，不用在index前加unique来删，直接就可以删了
+alter table s1 drop primary key; #删除主键(因为添加的时候是按照alter来增加的，也用alter来删)
+</code></pre>
 </li>
 </ul>
 
