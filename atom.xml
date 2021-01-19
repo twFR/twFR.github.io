@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-19T13:07:23.917Z</updated>
+    <updated>2021-01-19T13:09:35.524Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,114 +10,6 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 🌟谭先生✨</rights>
-    <entry>
-        <title type="html"><![CDATA[mysql]]></title>
-        <id>https://twFR.github.io/post/mysql/</id>
-        <link href="https://twFR.github.io/post/mysql/">
-        </link>
-        <updated>2021-01-19T06:43:23.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="sql执行过程">sql执行过程</h2>
-<p>大体来说，mysql可以分为server层和引擎层两部分</p>
-<p>Server层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖MySQL的大多数核心服务功能，以及所有的内置函数（如日期、时间、数学和加密函数等），所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图等</p>
-<p>存储引擎层负责数据的存储和提取，支持 InnoDB、MyISAM、Memory 等多个存储引擎，现在的默认引擎是<font color=red>InnoDB</font></p>
-<p>执行sql的大致流程如下：</p>
-<ol>
-<li>远程或者本地连接上数据后，执行sql命令</li>
-<li>sql命令发送到服务端，首先查询缓存（在8.0取消了缓存机制），缓存以key-value形式存储在内存中，key是查询语句，value是查询结果。缓存中如果找到对应的key，就直接返回结果</li>
-<li>如果找不到缓存，就要真正执行sql了。mysql的<code>分析器</code>先做<code>词法分析</code>，把sql里面的字符串是什么，代表什么识别出来；然后做<code>语法分析</code>,判断输入的sql语句是否满足语法（做什么）</li>
-<li>分析完之后，mysql就会知道要做什么了，然后<code>优化器</code>开始工作。如果有索引，优化器会决定使用哪个索引，或者多表连接的时候，决定各个表的连接顺序（怎么做）</li>
-<li>优化完毕，开始执行语句之前，会先判断是否有权限去操作表，如果有的话，就打开表继续执行，<code>执行器</code>根据表引擎定义，使用这个引擎提供的接口，获取数据将结果返回给客户端</li>
-</ol>
-<h2 id="mysql-索引">mysql 索引</h2>
-<p>索引的目的是为了加快查询速度，是存储引擎用于快速找到记录的一种数据结构。</p>
-<h3 id="索引分类">索引分类</h3>
-<ul>
-<li>普通索引index :加速查找</li>
-<li>唯一索引
-<ul>
-<li>主键索引：primary key ：加速查找+约束（不为空且唯一）</li>
-<li>唯一索引：unique：加速查找+约束 （唯一）</li>
-</ul>
-</li>
-<li>联合索引
-<ul>
-<li>primary key(id,name):联合主键索引</li>
-<li>unique(id,name):联合唯一索引</li>
-<li>index(id,name):联合普通索引</li>
-</ul>
-</li>
-<li>全文索引fulltext :用于搜索很长一篇文章的时候，效果最好。</li>
-<li>空间索引spatial :了解就好，几乎不用</li>
-</ul>
-<h3 id="索引算法">索引算法</h3>
-<ul>
-<li>
-<p>哈希索引 （查询单条快，范围查询慢）<br>
-hash索引结构的特殊性，其检索效率非常高，索引的检索可以一次定位，不像B-Tree索引需要从根节点到枝节点，最后才能访问到页节点这样多次的IO访问，所以Hash索引的查询效率要远高于B-Tree索引<br>
-但hash索引由于起特殊性也带来了很多限制和弊端：</p>
-<ol>
-<li>hash索引只支持等值比较查询，包括＝、 IN 、&lt;=&gt;  (注意&lt;&gt;和＜＝＞是不同的操作，不支持任何范围查询，如&gt; &lt; like等，因为经过相应的Hash算法处理之后的Hash值的大小关系，并不能保证和Hash运算前完全一样</li>
-<li>Hash索引无法被用来避免数据的排序操作</li>
-<li>Hash索引不能利用部分索引键查询，对于组合索引，Hash索引在计算Hash值的时候是组合索引键合并后再一起计算Hash值，而不是单独计算Hash值，所以通过组合索引的前面一个或几个索引键进行查询的时候，Hash索引也无法被利用</li>
-<li>Hash索引在任何时候都不能避免表扫描。Hash索引是将索引键通过Hash运算之后，将 Hash运算结果的Hash值和所对应的行指针信息存放于一个Hash表中，于不同索引键存在相同Hash值，所以即使取满足某个Hash键值的数据的记录条数，也无法从Hash索引中直接完成查询，还是要通过访问表中的实际数据进行相应的比较，并得到相应的结果。</li>
-<li>hash索引遇到大量Hash值相等的情况后性能并不一定就会比BTree索引高。对于选择性比较低的索引键，如果创建Hash索引，那么将会存在大量记录指针信息存于同一个Hash值相关联。这样要定位某一条记录时就会非常麻烦，会浪费多次表数据的访问，而造成整体性能低下</li>
-</ol>
-</li>
-<li>
-<p>BTree索引（b+树，层数越多，数据量指数级增长，innodb默认支持）<br>
-磁盘io预读策略，当一次io的时候，不光把当前磁盘地址的数据，而是把相邻的数据也读到内存缓冲区内，BTree索引就用到了这个策略</p>
-<p><a href="www.liuzk.com/wp-content/uploads/2019/11/7.jpg">B+数图</a></p>
-<p>B+树是一个从顶层向下查找的树，非叶子节点只存储指引搜索方向的数据项，叶子结点存储真实的数据</p>
-<ol>
-<li>如上图，根节点也就是页1常驻内存，此时不需要读取磁盘数据，直接从内存中读取</li>
-<li>如果现在要查找小于18的数据或者范围值，首先找到id=1的键值，然后根据p1指针就定位到了页2</li>
-<li>拿着p1指针去磁盘读取页2后将页2放在内存中，然后进行超找，可以找到键值1，再拿到p1指针，定位到页1</li>
-<li>同样页1不存在内存中，根据p1去磁盘读取页1到内存中。此时，因为已经在数据页即叶子结点了，页中数据都是链表进行连接的，而且键值顺序存放，此时用二分查找定位到1，所以只需要根据1往后面遍历匹配满足条件的数据就好了。一直到键值5的数据，页1就没有数据了，拿着页1的p指针去读页2的数据</li>
-<li>同样读到内存后，重复4的操作，直到不满足。</li>
-<li>最后满足的数据为(1,aa) (3,ki)...(17,mn) 9个数据</li>
-</ol>
-<p>B+数性质：</p>
-<ul>
-<li>索引的字段尽量的小：通过上述的流程可以看出，IO次数取决于b+数的高度h，假设当前数据表的数据为N，每个磁盘块的数据项的数量是m，则有h=㏒(m+1)N，当数据量N一定的情况下，m越大，h越小；而m = 磁盘块的大小 / 数据项的大小，磁盘块的大小也就是一个数据页的大小，是固定的，如果数据项占的空间越小，数据项的数量越多，树的高度越低。这就是为什么每个数据项，即索引字段要尽量的小，比如int占4字节，要比bigint8字节少一半。这也是为什么b+树要求把真实的数据放到叶子节点而不是内层节点，一旦放到内层节点，磁盘块的数据项会大幅度下降，导致树增高。当数据项等于1时将会退化成线性表。</li>
-<li>索引的最左匹配特性：当B+树是符合数据结构时，B+树是按照从左到右的顺序简历搜索树的，比如（name，age，sex），B+树会先通过name来比较后才能根据age，sex比较，检索到数据。如果name缺失，那B+树就不知道如何下手了，此时就不会用此索引了，必须按从左到右顺序来进行匹配，这就是最左匹配原则</li>
-</ul>
-</li>
-</ul>
-<h3 id="索引创建与删除">索引创建与删除</h3>
-<ul>
-<li>创建索引
-<ol>
-<li>建表就创</li>
-</ol>
-<pre><code>create table s1(
-id int ,
-name char(20),
-age int,
-email varchar(30)
-index(id) #可以这样加
-#primary key(id) #也可以在这加
-);
-</code></pre>
-<ol start="2">
-<li>建表后创建</li>
-</ol>
-<pre><code>```
-create index name on s1(name); #添加普通索引
-create unique age on s1(age);添加唯一索引
-alter table s1 add primary key(id); #添加住建索引，也就是给id字段增加一个主键
-create index name on s1(id,name); #添加普通联合索引
-```
-</code></pre>
-</li>
-<li>删除索引<pre><code>drop index id on s1;
-drop index name on s1; #删除普通索引
-drop index age on s1; #删除唯一索引，就和普通索引一样，不用在index前加unique来删，直接就可以删了
-alter table s1 drop primary key; #删除主键(因为添加的时候是按照alter来增加的，也用alter来删)
-</code></pre>
-</li>
-</ul>
-]]></content>
-    </entry>
     <entry>
         <title type="html"><![CDATA[Time Format]]></title>
         <id>https://twFR.github.io/post/time-format/</id>
@@ -410,6 +302,114 @@ CSV 成为 OperatorGroup 的活跃成员时，只要该 CSV 正在使用 AllName
 <li>og故障<br>
 1. 如果一个命名空间中存在多个 OperatorGroup，则在该命名空间中创建的所有 CSV 均会变成故障状态，故障原因为：TooManyOperatorGroups。一旦命名空间中 OperatorGroup 的数量变成 1，因该原因处于故障状态的 CSV 将转变为等待处理状态。<br>
 2. 如果 CSV 的 InstallMode 不支持其命名空间中 OperatorGroup 的目标命名空间选择，CSV 将变为故障状态，故障原因为 UnsupportedOperatorGroup。一旦 OperatorGroup 的目标命名空间选择变为受支持的配置，或 CSV 的 InstallMode 经修改后支持 OperatorGroup 的目标命名空间选择，因该原因处于故障状态的 CSV 将转变为等待处理状态。</li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[mysql]]></title>
+        <id>https://twFR.github.io/post/mysql/</id>
+        <link href="https://twFR.github.io/post/mysql/">
+        </link>
+        <updated>2020-07-19T06:43:23.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="sql执行过程">sql执行过程</h2>
+<p>大体来说，mysql可以分为server层和引擎层两部分</p>
+<p>Server层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖MySQL的大多数核心服务功能，以及所有的内置函数（如日期、时间、数学和加密函数等），所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图等</p>
+<p>存储引擎层负责数据的存储和提取，支持 InnoDB、MyISAM、Memory 等多个存储引擎，现在的默认引擎是<font color=red>InnoDB</font></p>
+<p>执行sql的大致流程如下：</p>
+<ol>
+<li>远程或者本地连接上数据后，执行sql命令</li>
+<li>sql命令发送到服务端，首先查询缓存（在8.0取消了缓存机制），缓存以key-value形式存储在内存中，key是查询语句，value是查询结果。缓存中如果找到对应的key，就直接返回结果</li>
+<li>如果找不到缓存，就要真正执行sql了。mysql的<code>分析器</code>先做<code>词法分析</code>，把sql里面的字符串是什么，代表什么识别出来；然后做<code>语法分析</code>,判断输入的sql语句是否满足语法（做什么）</li>
+<li>分析完之后，mysql就会知道要做什么了，然后<code>优化器</code>开始工作。如果有索引，优化器会决定使用哪个索引，或者多表连接的时候，决定各个表的连接顺序（怎么做）</li>
+<li>优化完毕，开始执行语句之前，会先判断是否有权限去操作表，如果有的话，就打开表继续执行，<code>执行器</code>根据表引擎定义，使用这个引擎提供的接口，获取数据将结果返回给客户端</li>
+</ol>
+<h2 id="mysql-索引">mysql 索引</h2>
+<p>索引的目的是为了加快查询速度，是存储引擎用于快速找到记录的一种数据结构。</p>
+<h3 id="索引分类">索引分类</h3>
+<ul>
+<li>普通索引index :加速查找</li>
+<li>唯一索引
+<ul>
+<li>主键索引：primary key ：加速查找+约束（不为空且唯一）</li>
+<li>唯一索引：unique：加速查找+约束 （唯一）</li>
+</ul>
+</li>
+<li>联合索引
+<ul>
+<li>primary key(id,name):联合主键索引</li>
+<li>unique(id,name):联合唯一索引</li>
+<li>index(id,name):联合普通索引</li>
+</ul>
+</li>
+<li>全文索引fulltext :用于搜索很长一篇文章的时候，效果最好。</li>
+<li>空间索引spatial :了解就好，几乎不用</li>
+</ul>
+<h3 id="索引算法">索引算法</h3>
+<ul>
+<li>
+<p>哈希索引 （查询单条快，范围查询慢）<br>
+hash索引结构的特殊性，其检索效率非常高，索引的检索可以一次定位，不像B-Tree索引需要从根节点到枝节点，最后才能访问到页节点这样多次的IO访问，所以Hash索引的查询效率要远高于B-Tree索引<br>
+但hash索引由于起特殊性也带来了很多限制和弊端：</p>
+<ol>
+<li>hash索引只支持等值比较查询，包括＝、 IN 、&lt;=&gt;  (注意&lt;&gt;和＜＝＞是不同的操作，不支持任何范围查询，如&gt; &lt; like等，因为经过相应的Hash算法处理之后的Hash值的大小关系，并不能保证和Hash运算前完全一样</li>
+<li>Hash索引无法被用来避免数据的排序操作</li>
+<li>Hash索引不能利用部分索引键查询，对于组合索引，Hash索引在计算Hash值的时候是组合索引键合并后再一起计算Hash值，而不是单独计算Hash值，所以通过组合索引的前面一个或几个索引键进行查询的时候，Hash索引也无法被利用</li>
+<li>Hash索引在任何时候都不能避免表扫描。Hash索引是将索引键通过Hash运算之后，将 Hash运算结果的Hash值和所对应的行指针信息存放于一个Hash表中，于不同索引键存在相同Hash值，所以即使取满足某个Hash键值的数据的记录条数，也无法从Hash索引中直接完成查询，还是要通过访问表中的实际数据进行相应的比较，并得到相应的结果。</li>
+<li>hash索引遇到大量Hash值相等的情况后性能并不一定就会比BTree索引高。对于选择性比较低的索引键，如果创建Hash索引，那么将会存在大量记录指针信息存于同一个Hash值相关联。这样要定位某一条记录时就会非常麻烦，会浪费多次表数据的访问，而造成整体性能低下</li>
+</ol>
+</li>
+<li>
+<p>BTree索引（b+树，层数越多，数据量指数级增长，innodb默认支持）<br>
+磁盘io预读策略，当一次io的时候，不光把当前磁盘地址的数据，而是把相邻的数据也读到内存缓冲区内，BTree索引就用到了这个策略</p>
+<p><a href="www.liuzk.com/wp-content/uploads/2019/11/7.jpg">B+数图</a></p>
+<p>B+树是一个从顶层向下查找的树，非叶子节点只存储指引搜索方向的数据项，叶子结点存储真实的数据</p>
+<ol>
+<li>如上图，根节点也就是页1常驻内存，此时不需要读取磁盘数据，直接从内存中读取</li>
+<li>如果现在要查找小于18的数据或者范围值，首先找到id=1的键值，然后根据p1指针就定位到了页2</li>
+<li>拿着p1指针去磁盘读取页2后将页2放在内存中，然后进行超找，可以找到键值1，再拿到p1指针，定位到页1</li>
+<li>同样页1不存在内存中，根据p1去磁盘读取页1到内存中。此时，因为已经在数据页即叶子结点了，页中数据都是链表进行连接的，而且键值顺序存放，此时用二分查找定位到1，所以只需要根据1往后面遍历匹配满足条件的数据就好了。一直到键值5的数据，页1就没有数据了，拿着页1的p指针去读页2的数据</li>
+<li>同样读到内存后，重复4的操作，直到不满足。</li>
+<li>最后满足的数据为(1,aa) (3,ki)...(17,mn) 9个数据</li>
+</ol>
+<p>B+数性质：</p>
+<ul>
+<li>索引的字段尽量的小：通过上述的流程可以看出，IO次数取决于b+数的高度h，假设当前数据表的数据为N，每个磁盘块的数据项的数量是m，则有h=㏒(m+1)N，当数据量N一定的情况下，m越大，h越小；而m = 磁盘块的大小 / 数据项的大小，磁盘块的大小也就是一个数据页的大小，是固定的，如果数据项占的空间越小，数据项的数量越多，树的高度越低。这就是为什么每个数据项，即索引字段要尽量的小，比如int占4字节，要比bigint8字节少一半。这也是为什么b+树要求把真实的数据放到叶子节点而不是内层节点，一旦放到内层节点，磁盘块的数据项会大幅度下降，导致树增高。当数据项等于1时将会退化成线性表。</li>
+<li>索引的最左匹配特性：当B+树是符合数据结构时，B+树是按照从左到右的顺序简历搜索树的，比如（name，age，sex），B+树会先通过name来比较后才能根据age，sex比较，检索到数据。如果name缺失，那B+树就不知道如何下手了，此时就不会用此索引了，必须按从左到右顺序来进行匹配，这就是最左匹配原则</li>
+</ul>
+</li>
+</ul>
+<h3 id="索引创建与删除">索引创建与删除</h3>
+<ul>
+<li>创建索引
+<ol>
+<li>建表就创</li>
+</ol>
+<pre><code>create table s1(
+id int ,
+name char(20),
+age int,
+email varchar(30)
+index(id) #可以这样加
+#primary key(id) #也可以在这加
+);
+</code></pre>
+<ol start="2">
+<li>建表后创建</li>
+</ol>
+<pre><code>```
+create index name on s1(name); #添加普通索引
+create unique age on s1(age);添加唯一索引
+alter table s1 add primary key(id); #添加住建索引，也就是给id字段增加一个主键
+create index name on s1(id,name); #添加普通联合索引
+```
+</code></pre>
+</li>
+<li>删除索引<pre><code>drop index id on s1;
+drop index name on s1; #删除普通索引
+drop index age on s1; #删除唯一索引，就和普通索引一样，不用在index前加unique来删，直接就可以删了
+alter table s1 drop primary key; #删除主键(因为添加的时候是按照alter来增加的，也用alter来删)
+</code></pre>
+</li>
 </ul>
 ]]></content>
     </entry>
