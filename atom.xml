@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://twFR.github.io</id>
     <title>🌟谭先生✨</title>
-    <updated>2021-01-19T01:59:52.828Z</updated>
+    <updated>2021-01-19T02:01:25.433Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://twFR.github.io"/>
     <link rel="self" href="https://twFR.github.io/atom.xml"/>
@@ -10,69 +10,6 @@
     <logo>https://twFR.github.io/images/avatar.png</logo>
     <icon>https://twFR.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 🌟谭先生✨</rights>
-    <entry>
-        <title type="html"><![CDATA[priority queue]]></title>
-        <id>https://twFR.github.io/post/priority-queue/</id>
-        <link href="https://twFR.github.io/post/priority-queue/">
-        </link>
-        <updated>2021-01-19T01:41:25.000Z</updated>
-        <content type="html"><![CDATA[<p>优先队列，即不按进栈顺序，按优先级出栈，又分为最大优先级队列和最小优先级队列</p>
-<p>golang可以使用heap堆操作来实现一个优先级队列</p>
-<p>heap的堆结构如下：</p>
-<pre><code>type Interface interface {
-    sort.Interface
-    Push(x interface{}) 
-    Pop() interface{}   
-}
-</code></pre>
-<p>故只需要实现sort的三个方法，和push，pop方法，即可实现一个优先级队列</p>
-<pre><code>
-package main
-
-import (
-	&quot;container/heap&quot;
-	&quot;fmt&quot;
-)
-
-type stu struct {
-	name string
-	age  int
-}
-type Stu []stu
-
-func (t *Stu) Len() int {
-	return len(*t)
-}
-
-func (t *Stu) Less(i, j int) bool {
-	return (*t)[i].age &lt; (*t)[j].age
-}
-func (t *Stu) Swap(i, j int) {
-	(*t)[i], (*t)[j] = (*t)[j], (*t)[i]
-}
-
-func (t *Stu) Push(x interface{}) {
-	*t = append(*t, x.(stu))
-}
-func (t *Stu) Pop() interface{} {
-	n := len(*t)
-	x := (*t)[n-1]
-	*t = (*t)[:n-1]
-	return x
-}
-func main() {
-	student := &amp;Stu{{&quot;Amy&quot;, 21}, {&quot;Dav&quot;, 15}, {&quot;Spo&quot;, 22}, {&quot;Reb&quot;, 11}}
-	heap.Init(student)
-	one := stu{&quot;hund&quot;, 9}
-	heap.Push(student, one)
-	for student.Len() &gt; 0 {
-		fmt.Printf(&quot;%v\n&quot;, heap.Pop(student))
-	}
-}
-</code></pre>
-<p>上面是一个最小优先级队列。把less里面改改，就是一个最大优先级了，当然，不太符合编程规范，哈哈。</p>
-]]></content>
-    </entry>
     <entry>
         <title type="html"><![CDATA[Time Format]]></title>
         <id>https://twFR.github.io/post/time-format/</id>
@@ -843,6 +780,69 @@ ocker Daemon 可以认为是通过 Docker Server 模块接受 Docker Client 的�
 <li>下载完成后，镜像被保存到本地</li>
 <li>Docker daemon 启动容器</li>
 </ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[priority queue]]></title>
+        <id>https://twFR.github.io/post/priority-queue/</id>
+        <link href="https://twFR.github.io/post/priority-queue/">
+        </link>
+        <updated>2020-03-25T01:41:25.000Z</updated>
+        <content type="html"><![CDATA[<p>优先队列，即不按进栈顺序，按优先级出栈，又分为最大优先级队列和最小优先级队列</p>
+<p>golang可以使用heap堆操作来实现一个优先级队列</p>
+<p>heap的堆结构如下：</p>
+<pre><code>type Interface interface {
+    sort.Interface
+    Push(x interface{}) 
+    Pop() interface{}   
+}
+</code></pre>
+<p>故只需要实现sort的三个方法，和push，pop方法，即可实现一个优先级队列</p>
+<pre><code>
+package main
+
+import (
+	&quot;container/heap&quot;
+	&quot;fmt&quot;
+)
+
+type stu struct {
+	name string
+	age  int
+}
+type Stu []stu
+
+func (t *Stu) Len() int {
+	return len(*t)
+}
+
+func (t *Stu) Less(i, j int) bool {
+	return (*t)[i].age &lt; (*t)[j].age
+}
+func (t *Stu) Swap(i, j int) {
+	(*t)[i], (*t)[j] = (*t)[j], (*t)[i]
+}
+
+func (t *Stu) Push(x interface{}) {
+	*t = append(*t, x.(stu))
+}
+func (t *Stu) Pop() interface{} {
+	n := len(*t)
+	x := (*t)[n-1]
+	*t = (*t)[:n-1]
+	return x
+}
+func main() {
+	student := &amp;Stu{{&quot;Amy&quot;, 21}, {&quot;Dav&quot;, 15}, {&quot;Spo&quot;, 22}, {&quot;Reb&quot;, 11}}
+	heap.Init(student)
+	one := stu{&quot;hund&quot;, 9}
+	heap.Push(student, one)
+	for student.Len() &gt; 0 {
+		fmt.Printf(&quot;%v\n&quot;, heap.Pop(student))
+	}
+}
+</code></pre>
+<p>上面是一个最小优先级队列。把less里面改改，就是一个最大优先级了，当然，不太符合编程规范，哈哈。</p>
 ]]></content>
     </entry>
     <entry>
